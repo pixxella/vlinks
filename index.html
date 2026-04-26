@@ -15,151 +15,147 @@
             align-items: center;
             min-height: 100vh;
             margin: 0;
-            padding: 20px;
+            padding: 10px;
             box-sizing: border-box;
         }
 
         .container {
             border: 4px solid #a349a4;
-            padding: 40px;
+            padding: 20px 30px; /* Reduced vertical padding */
             width: 100%;
-            max-width: 600px;
+            max-width: 550px;
             background: #151515;
-            box-shadow: 15px 15px 0px #a349a4;
+            box-shadow: 12px 12px 0px #a349a4;
             box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
         }
 
         h1 {
-            font-size: clamp(2rem, 8vw, 3rem);
-            margin: 0 0 25px 0;
+            font-size: clamp(1.5rem, 6vw, 2.5rem); /* Smaller title to save space */
+            margin: 0 0 15px 0;
             color: #ffa2fd;
             text-transform: lowercase;
-            letter-spacing: -2px;
+            text-align: center;
         }
 
         .links {
             display: flex;
             flex-direction: column;
-            gap: 15px;
+            gap: 10px; /* Tighter gap */
         }
 
         .link-group {
             display: flex;
             flex-direction: column;
-            gap: 5px;
+            gap: 3px;
         }
 
         a {
             color: #fff;
             text-decoration: none;
-            padding: 15px;
-            font-size: 1.2rem;
+            padding: 12px; /* Smaller buttons */
+            font-size: 1.1rem;
             text-align: center;
             font-weight: bold;
             transition: 0.1s;
-            border: 4px solid;
+            border: 3px solid;
             background: #111;
         }
 
-        /* --- Platform Colors --- */
+        /* --- Colors --- */
         .roblox {
-            border-color: #ffffff #555555 #555555 #ffffff;
+            border-color: #fff #555 #555 #fff;
         }
-
-            .roblox:hover {
-                box-shadow: 0 0 15px #ffffff;
-            }
 
         .twitch {
             border-color: #9146FF #bf94ff #bf94ff #9146FF;
         }
 
-            .twitch:hover {
-                box-shadow: 0 0 15px #9146FF;
-            }
-
         .tiktok {
             border-image: linear-gradient(45deg, #ff0050, #00f2ea) 1;
-            border-width: 4px;
+            border-width: 3px;
         }
-
-            .tiktok:hover {
-                box-shadow: 0 0 15px #ff0050;
-            }
 
         .discord {
             border-color: #5865F2 #7289da #7289da #5865F2;
         }
 
-            .discord:hover {
-                box-shadow: 0 0 15px #5865F2;
-            }
-
-        .server {
+        .server-vip {
             border-color: #ffd700 #b8860b #b8860b #ffd700;
+            color: #f9d824;
         }
 
-            .server:hover {
-                box-shadow: 0 0 15px #ffd700;
-            }
+        .server-current {
+            border-color: #00ff41 #008f11 #008f11 #00ff41;
+            color: #47fd48;
+        }
 
         .src-link {
             border-color: #5a2d82;
-            font-size: 0.9rem;
-            margin-top: 10px;
-            opacity: 0.7;
+            font-size: 0.8rem;
+            opacity: 0.6;
         }
 
         a:hover {
-            transform: translate(-3px, -3px);
+            transform: translate(-2px, -2px);
         }
 
-        /* --- Small Notice Style --- */
         .notice {
-            font-size: 0.7rem;
-            color: #ffd700;
-            opacity: 0.8;
+            font-size: 0.65rem;
             text-align: center;
-            font-style: italic;
+            font-weight: bold;
+            line-height: 1;
         }
 
+        .gold-text {
+            color: #ffff00;
+        }
+
+        .green-text {
+            color: #00ff00;
+        }
+
+        /* --- Footer (This is what was missing) --- */
         .footer {
-            margin-top: 40px;
-            font-size: 0.85rem;
+            margin-top: 20px;
             border-top: 1px solid #333;
-            padding-top: 20px;
+            padding-top: 15px;
         }
 
         .update-log {
+            font-size: 0.75rem;
             opacity: 0.6;
-            margin-bottom: 20px;
-            line-height: 1.4;
+            margin-bottom: 10px;
         }
 
         .dm-section {
             background: #1e0a2d;
-            padding: 10px;
-            border-left: 3px solid #ffa2fd;
-            margin-bottom: 20px;
+            padding: 8px;
+            border-left: 4px solid #ffa2fd;
+            margin-bottom: 15px;
+            font-size: 0.8rem;
         }
 
         .copyright {
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             opacity: 0.4;
             text-align: center;
             border-top: 1px solid #222;
-            padding-top: 15px;
+            padding-top: 10px;
         }
 
-        @media (max-width: 480px) {
+        @media (max-height: 700px) {
             .container {
-                padding: 25px;
-                box-shadow: 8px 8px 0px #a349a4;
+                padding: 15px;
             }
 
-            a {
-                padding: 12px;
-                font-size: 1rem;
+            h1 {
+                margin-bottom: 10px;
+            }
+
+            .footer {
+                margin-top: 10px;
             }
         }
     </style>
@@ -176,8 +172,13 @@
             <a href="https://discord.gg/ccGFawHpjQ" class="discord">discord</a>
 
             <div class="link-group">
-                <a href="https://is.gd/votserv2/" class="server">private server</a>
-                <span class="notice">may not work; tell us in stream. will be fixed fast</span>
+                <a href="https://is.gd/votserv2/" class="server-vip">private server</a>
+                <span class="notice gold-text">may not work; tell us in stream. will be fixed fast</span>
+            </div>
+
+            <div class="link-group">
+                <a href="#" class="server-current">current server</a>
+                <span class="notice green-text">if it doesnt work notify us, rarely works but we will fix</span>
             </div>
 
             <a href="https://github.com/pixxella/VernersIoPage" class="src-link">src code</a>
@@ -185,9 +186,8 @@
 
         <div class="footer">
             <div class="update-log">
-                <strong>updated:</strong> today or a couple days ago<br>
-                (discord finally out!)<br>
-                
+                <strong>updated:</strong> 2026-04-26 (v1.0.4)<br>
+                (discord finally out!)
             </div>
 
             <div class="dm-section">
@@ -195,7 +195,7 @@
             </div>
 
             <div class="copyright">
-                © Copyright 2026 The Huge nPixelz™<br>All rights reserved®
+                © Copyright 2026 The Huge nPixelz™ | All rights reserved®
             </div>
         </div>
     </div>
