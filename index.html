@@ -4,9 +4,10 @@
     <title>verner</title>
     <style>
         body {
-            background: #ffa2fd;
-            color: #d1d1d1;
-            font-family: 'Jetbrains Mono', monospace;
+            /* Fixed background so the card actually pops */
+            background: #0d0d0d;
+            color: #eeeeee;
+            font-family: 'JetBrains Mono', monospace;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -15,56 +16,64 @@
         }
 
         .container {
-            border: 2px solid #ffa2fd; /* Deep purple, not neon */
-            padding: 30px;
-            width: 320px;
-            background: #ffa2fd;
+            /* Made the stuff bigger */
+            border: 3px solid #a349a4;
+            padding: 40px;
+            width: 450px; /* Wider card */
+            background: #1a1a1a; /* Darker card background */
+            box-shadow: 15px 15px 0px #a349a4; /* Hard shadow for aura */
         }
 
         h1 {
-            font-size: 1.2rem;
-            margin: 0 0 10px 0;
-            color: #a349a4;
+            font-size: 2rem; /* Bigger title */
+            margin: 0 0 20px 0;
+            color: #ffa2fd;
+            text-transform: lowercase;
         }
 
-        /* The stretched image fix */
         .img-box {
             width: 100%;
-            height: 50px; /* Cursed stretch */
+            height: 80px; /* Bigger stretched image */
             background: #000;
-            margin-bottom: 15px;
+            margin-bottom: 25px;
+            border: 1px solid #a349a4;
         }
 
         img {
             width: 100%;
             height: 100%;
-            object-image: fill;
             object-fit: fill;
+            display: block;
         }
 
         .links {
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: 15px;
         }
 
         a {
             color: #fff;
             text-decoration: none;
-            border: 1px solid #333;
-            padding: 10px;
-            font-size: 0.9rem;
+            border: 2px solid #333;
+            padding: 15px;
+            font-size: 1.1rem; /* Bigger text */
+            text-align: center;
+            transition: 0.1s;
         }
 
             a:hover {
-                background: #5a2d82;
-                border-color: #a366ff;
+                background: #a349a4;
+                border-color: #ffa2fd;
+                transform: translate(-3px, -3px);
+                box-shadow: 5px 5px 0px #5a2d82;
             }
 
         .footer {
-            margin-top: 15px;
-            font-size: 0.7rem;
-            opacity: 0.4;
+            margin-top: 25px;
+            font-size: 0.8rem;
+            opacity: 0.5;
+            text-align: right;
         }
     </style>
 </head>
