@@ -200,38 +200,36 @@
     </div>
 
     <script>
-        async function updateGitStatus() {
-        const repo = "pixxella/VernersIoPage";
-        const statusEl = document.getElementById('git-status');
-
+        async function fetchStatus() {
         try {
-        // 1. Get latest commit message
-        const commitRes = await fetch(`https://api.github.com/repos/${repo}/commits/master`);
-        const commitData = await commitRes.json();
-        const message = commitData.commit.message;
-        const date = new Date(commitData.commit.author.date).toLocaleDateString();
+        // We add ?t= to the end so the browser doesn't cache the old version
+        const res = await fetch('./status.json?t=' + Date.now());
+        if (!res.ok) throw new Error('Not found');
+        const data = await res.json();
 
-        // 2. Get GitHub Actions build status
-        const runRes = await fetch(`https://api.github.com/repos/${repo}/actions/runs?per_page=1`);
-        const runData = await runRes.json();
+        const statusText = document.getElementById('workflow-status');
+        const commitText = document.getElementById('commit-info');
 
-        let status = "pushed";
-        if (runData.workflow_runs.length > 0) {
-        const latestRun = runData.workflow_runs[0];
-        status = latestRun.status === "completed" ? latestRun.conclusion : "building...";
+        // Set the color/text based on the status in the JSON
+        let statusHTML = '';
+        if (data.status === 'building...') {
+        statusHTML = '<span class="status-building">BUILDING...</span>';
+        } else if (data.status === 'success') {
+        statusHTML = '<span class="status-success">LATEST (LIVE)</span>';
+        } else {
+        statusHTML = '<span style="color:red">ERROR</span>';
         }
 
-        // 3. Inject into the page
-        statusEl.innerHTML = `
-        <strong>latest commit:</strong> "${message}"<br>
-        <strong>status:</strong> ${status} (${date})
-        `;
-        } catch (e) {
-        statusEl.innerHTML = "<strong>status:</strong> failed to load git info";
+        statusText.innerHTML = statusHTML;
+        commitText.innerHTML = `<strong>latest:</strong> "${data.message}" <small style="opacity:0.5">[${data.sha.substring(0,7)}]</small>`;
+        } catch (err) {
+        console.log("Waiting for status.json to be created by the Action...");
         }
         }
 
-        updateGitStatus();
+        // Refresh every 5 seconds—now with zero rate limits!
+        setInterval(fetchStatus, 5000);
+        fetchStatus();
     </script>
 </body>
 </html>
