@@ -1,0 +1,29 @@
+name: Update Status JSON
+on:
+  workflow_run:
+    workflows: ["pages-build-deployment"] # Wait for the actual deploy
+    types: [requested, completed]
+
+jobs:
+  update-json:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Update JSON
+        run: |
+          STATUS="${{ github.event.workflow_run.status }}"
+          CONCLUSION="${{ github.event.workflow_run.conclusion }}"
+          # Map GitHub terms to your Gen Z terms
+          if [ "$STATUS" == "requested" ]; then FINAL="building...";
+          elif [ "$CONCLUSION" == "success" ]; then FINAL="success";
+          else FINAL="cooked"; fi
+          
+          echo "{\"message\": \"${{ github.event.workflow_run.head_commit.message }}\", \"status\": \"$FINAL\", \"sha\": \"${{ github.event.workflow_run.head_sha }}\"}" > status.json
+          
+      - name: Commit change
+        run: |
+          git config --global user.name 'StatusBot'
+          git config --global user.email 'bot@pixel.io'
+          git add status.json
+          git commit -m "update live status [skip ci]"
+          git push
