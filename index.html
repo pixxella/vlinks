@@ -1,169 +1,91 @@
 ﻿<!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VernersPage</title>
+    <title>verner</title>
     <style>
-        :root {
-            --void: #0a001a;
-            --indigo: #4b0082;
-            --neon: #8a2be2;
-            --text: #e0d0ff;
-        }
-
         body {
-            background-color: var(--void);
-            color: var(--text);
-            font-family: 'Courier New', Courier, monospace; /* Hard-core coder vibe */
-            margin: 0;
+            background: #0f0f0f;
+            color: #d1d1d1;
+            font-family: 'Consolas', monospace;
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: 100vh;
-            overflow: hidden;
+            height: 100vh;
+            margin: 0;
         }
 
-            /* Scanline Effect - Makes it look like a real monitor, not an AI mockup */
-            body::before {
-                content: " ";
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100vw;
-                height: 100vh;
-                background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
-                background-size: 100% 4px, 3px 100%;
-                z-index: 10;
-                pointer-events: none;
-            }
-
-        .terminal {
-            width: 90%;
-            max-width: 500px;
-            background: #0d021f;
-            border: 1px solid var(--indigo);
-            padding: 20px;
-            box-shadow: 10px 10px 0px var(--indigo); /* Hard shadow, not soft glow */
-            position: relative;
-        }
-
-        .header {
-            background: var(--indigo);
-            color: white;
-            padding: 5px 10px;
-            margin: -20px -20px 20px -20px;
-            font-size: 0.8rem;
-            display: flex;
-            justify-content: space-between;
+        .container {
+            border: 2px solid #5a2d82; /* Deep purple, not neon */
+            padding: 30px;
+            width: 320px;
+            background: #141414;
         }
 
         h1 {
-            font-size: 1.5rem;
-            margin: 0;
-            color: var(--neon);
-            text-transform: uppercase;
+            font-size: 1.2rem;
+            margin: 0 0 10px 0;
+            color: #a366ff;
         }
 
-        /* FIXED STRETCHED IMAGE */
-        .image-box {
+        /* The stretched image fix */
+        .img-box {
             width: 100%;
-            height: 60px; /* Maximum cursed stretch */
-            background: #1a1a1a;
-            margin: 15px 0;
-            border: 1px dashed var(--neon);
-            overflow: hidden;
+            height: 50px; /* Cursed stretch */
+            background: #000;
+            margin-bottom: 15px;
         }
 
-        .stretched {
+        img {
             width: 100%;
             height: 100%;
+            object-image: fill;
             object-fit: fill;
-            filter: grayscale(0.5) contrast(1.2) sepia(0.5) hue-rotate(250deg);
         }
 
         .links {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            margin-top: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
         }
 
-        .btn {
-            border: 1px solid var(--neon);
-            padding: 10px;
-            text-align: center;
+        a {
+            color: #fff;
             text-decoration: none;
-            color: var(--text);
+            border: 1px solid #333;
+            padding: 10px;
             font-size: 0.9rem;
-            transition: 0.1s;
         }
 
-            .btn:hover {
-                background: var(--neon);
-                color: white;
-                cursor: crosshair;
+            a:hover {
+                background: #5a2d82;
+                border-color: #a366ff;
             }
 
-        .full-width {
-            grid-column: span 2;
-        }
-
-        .glitch {
-            font-size: 0.7rem;
-            opacity: 0.5;
+        .footer {
             margin-top: 15px;
-            display: block;
-        }
-
-        /* CRT Flicker */
-        @keyframes flicker {
-            0% {
-                opacity: 0.97;
-            }
-
-            5% {
-                opacity: 0.95;
-            }
-
-            10% {
-                opacity: 0.9;
-            }
-
-            100% {
-                opacity: 1;
-            }
-        }
-
-        .terminal {
-            animation: flicker 0.1s infinite;
+            font-size: 0.7rem;
+            opacity: 0.4;
         }
     </style>
 </head>
 <body>
 
-    <div class="terminal">
-        <div class="header">
-            <span>STATUS: ACTIVE</span>
-            <span>USER: Verner</span>
-        </div>
+    <div class="container">
+        <h1>verner_hub</h1>
 
-        <h1>> VERNER_HUB</h1>
-        <p style="margin: 5px 0;">[Locating assets...] [Success]</p>
-
-        <div class="image-box">
-            <img src="https://www.roblox.com/headshot-thumbnail/image?userId=5252491078&width=420&height=420&format=png"
-                 class="stretched"
-                 onerror="this.src='https://via.placeholder.com/400x100/0a001a/4b0082?text=MISSING_DATA'">
+        <div class="img-box">
+            <img src="https://www.roblox.com/headshot-thumbnail/image?userId=5252491078&width=420&height=420&format=png">
         </div>
 
         <div class="links">
-            <a href="https://www.roblox.com/users/5252491078/profile" class="btn">ROBLOX.EXE</a>
-            <a href="https://twitch.tv/Verner_Ww" class="btn">TWITCH.LNK</a>
-            <a href="#" class="btn full-width">DISCORD_INVITE (WIP)</a>
+            <a href="https://www.roblox.com/users/5252491078/profile">roblox</a>
+            <a href="https://twitch.tv/Verner_Ww">twitch</a>
+            <a href="#">discord</a>
         </div>
 
-        <span class="glitch">-- system_v2026_authorized --</span>
+        <div class="footer">
+            updated: 2026-04-26
+        </div>
     </div>
 
 </body>
