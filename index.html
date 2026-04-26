@@ -3,201 +3,155 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Verner | Void</title>
+    <title>Pixxella | Void</title>
     <style>
         :root {
-            --glow-color: #bc13fe;
-            --bg-color: #05010a;
-            --accent-cyan: #00ffff;
+            --glow: #bc13fe;
+            --bg: #0a0212;
         }
 
         body {
-            background-color: var(--bg-color);
+            background: var(--bg);
             color: #fff;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0;
-            overflow-x: hidden;
+            font-family: 'Consolas', monospace; /* More "tech nerd" vibe */
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
+            margin: 0;
+            overflow: hidden;
         }
 
-        /* --- THE PARTICLE BACKGROUND --- */
+        /* Particles */
         #particles {
             position: fixed;
-            top: 0;
-            left: 0;
             width: 100%;
             height: 100%;
             z-index: -1;
-            background: radial-gradient(circle at center, #1a0b2e 0%, #05010a 100%);
         }
 
-        .particle {
-            position: absolute;
-            background: rgba(188, 19, 254, 0.5);
-            border-radius: 50%;
-            filter: blur(2px);
-            animation: float 20s infinite linear;
-        }
-
-        @keyframes float {
-            0% {
-                transform: translateY(0) rotate(0deg);
-                opacity: 0;
-            }
-
-            50% {
-                opacity: 0.8;
-            }
-
-            100% {
-                transform: translateY(-100vh) rotate(360deg);
-                opacity: 0;
-            }
-        }
-
-        /* --- THE MAIN TOUGH CARD --- */
-        .glass-card {
-            background: rgba(255, 255, 255, 0.03);
-            backdrop-filter: blur(15px);
-            border: 1px solid rgba(188, 19, 254, 0.3);
-            border-radius: 20px;
-            padding: 40px;
-            width: 90%;
-            max-width: 450px;
+        .card {
+            background: rgba(15, 5, 25, 0.8);
+            border: 2px solid var(--glow);
+            border-radius: 12px;
+            padding: 30px;
+            width: 380px;
             text-align: center;
-            box-shadow: 0 0 20px rgba(188, 19, 254, 0.2);
-            transition: 0.3s;
-            margin: 20px;
+            box-shadow: 0 0 20px rgba(188, 19, 254, 0.3);
+            position: relative;
         }
-
-            .glass-card:hover {
-                border-color: var(--glow-color);
-                box-shadow: 0 0 40px rgba(188, 19, 254, 0.4);
-            }
 
         h1 {
-            font-size: 2.5rem;
-            margin-bottom: 5px;
-            text-shadow: 0 0 10px var(--glow-color), 0 0 20px var(--glow-color);
-            letter-spacing: 3px;
-            color: #fff;
+            font-size: 2.2rem;
+            margin: 0;
+            letter-spacing: 4px;
+            text-shadow: 2px 2px 0px var(--glow);
         }
 
-        .tagline {
-            color: #aaa;
-            font-size: 1rem;
-            margin-bottom: 25px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
+        /* THE IMAGE FIX */
+        .img-container {
+            width: 100%;
+            height: 70px; /* Force the squish */
+            margin: 20px 0;
+            overflow: hidden;
+            border: 1px solid var(--glow);
+            background: #1a0b2e; /* Dark fallback background */
         }
 
-        /* --- THE STRETCHED GOD --- */
         .stretched-god {
             width: 100%;
-            height: 80px; /* Squashed and tough */
-            object-fit: fill;
-            border: 2px solid var(--glow-color);
-            border-radius: 5px;
-            margin: 15px 0;
-            box-shadow: 0 0 10px var(--glow-color);
-            filter: saturate(1.5);
+            height: 100%;
+            object-fit: fill; /* The magic for stretching */
+            display: block;
         }
 
-        /* --- THE LINKS --- */
-        .links-container {
+        .links {
             display: flex;
             flex-direction: column;
             gap: 12px;
-            margin-top: 20px;
         }
 
         .btn {
-            padding: 14px;
-            background: rgba(0, 0, 0, 0.5);
-            border: 1px solid var(--glow-color);
-            text-align: center;
-            text-decoration: none;
+            background: transparent;
+            border: 1px solid #444;
             color: #fff;
+            padding: 12px;
+            text-decoration: none;
+            transition: 0.2s;
             font-weight: bold;
-            border-radius: 8px;
-            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            text-transform: uppercase;
-            letter-spacing: 1px;
         }
 
             .btn:hover {
-                background: var(--glow-color);
-                color: #fff;
-                box-shadow: 0 0 20px var(--glow-color);
-                transform: scale(1.05);
+                border-color: var(--glow);
+                background: rgba(188, 19, 254, 0.1);
+                box-shadow: inset 0 0 10px var(--glow);
             }
 
-        hr {
-            border: 0;
-            height: 1px;
-            background: linear-gradient(to right, transparent, var(--glow-color), transparent);
-            margin: 30px 0;
-        }
-
-        ul {
-            list-style: none;
-            padding: 0;
-            color: #ccc;
-        }
-
-        footer {
-            margin-top: 25px;
-            font-size: 0.7rem;
-            color: #555;
+        .status {
+            font-size: 0.8rem;
+            color: var(--glow);
+            margin-bottom: 20px;
+            display: block;
         }
     </style>
 </head>
 <body>
 
-    <div id="particles"></div>
+    <canvas id="particles"></canvas>
 
-    <div class="glass-card">
+    <div class="card">
         <h1>VERNER</h1>
-        <p class="tagline">Streamer</p>
+        <span class="status">SYSTEM_ACTIVE // STREAMING</span>
 
-        <img src="https://www.roblox.com/headshot-thumbnail/image?userId=5252491078&width=420&height=420&format=png" class="stretched-god" alt="Stretched Headshot">
-
-        <div class="links-container">
-            <a href="https://www.roblox.com/users/5252491078/profile" class="btn" target="_blank">Roblox Profile</a>
-            <a href="https://twitch.tv/Verner_Ww" class="btn" target="_blank">Twitch Stream</a>
-            <a href="#" class="btn" target="_blank">Discord (WIP)</a>
+        <div class="img-container">
+            <img src="https://www.roblox.com/headshot-thumbnail/image?userId=5252491078&width=420&height=420&format=png"
+                 class="stretched-god"
+                 onerror="this.src='https://via.placeholder.com/400x100/1a0b2e/bc13fe?text=IMAGE+LOADING...'">
         </div>
 
-        <hr>
-
-        <h3>PROJECTS:</h3>
-        <ul>
-            <li>🔴 Daily Streams</li>
-            <li>123</li>
-        </ul>
-
-        <footer>
-            &copy; 2026 Verner. Stay Cracked.
-        </footer>
+        <div class="links">
+            <a href="https://www.roblox.com/users/5252491078/profile" class="btn">ROBLOX</a>
+            <a href="https://twitch.tv/Verner_Ww" class="btn">TWITCH</a>
+            <a href="#" class="btn">DISCORD</a>
+        </div>
     </div>
 
     <script>
-        const bg = document.getElementById('particles');
-        for (let i = 0; i < 40; i++) {
-        const p = document.createElement('div');
-        p.className = 'particle';
-        const size = Math.random() * 4 + 2 + 'px';
-        p.style.width = size;
-        p.style.height = size;
-        p.style.left = Math.random() * 100 + '%';
-        p.style.top = Math.random() * 100 + '%';
-        p.style.animationDelay = Math.random() * 20 + 's';
-        p.style.animationDuration = Math.random() * 10 + 10 + 's';
-        bg.appendChild(p);
+        const canvas = document.getElementById('particles');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        let particles = [];
+
+        class Particle {
+        constructor() {
+        this.x = Math.random() * canvas.width;
+        this.y = Math.random() * canvas.height;
+        this.size = Math.random() * 2;
+        this.speedY = Math.random() * 0.5 + 0.2;
         }
+        update() {
+        this.y -= this.speedY;
+        if (this.y < 0) this.y = canvas.height;
+        }
+        draw() {
+        ctx.fillStyle = '#bc13fe';
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        ctx.fill();
+        }
+        }
+
+        function init() {
+        for (let i = 0; i < 60; i++) particles.push(new Particle());
+        }
+
+        function animate() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        particles.forEach(p => { p.update(); p.draw(); });
+        requestAnimationFrame(animate);
+        }
+        init(); animate();
     </script>
 </body>
 </html>
