@@ -1,29 +1,30 @@
 name: Update Status JSON
 on:
-  workflow_run:
-    workflows: ["pages-build-deployment"] # Wait for the actual deploy
-    types: [requested, completed]
+  push: # Triggering on push is easier for testing
+    branches: [main]
+
+permissions:
+  contents: write # This tells GitHub the bot has permission to write files
 
 jobs:
   update-json:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Gets the whole history so it doesn't freak out
+
       - name: Update JSON
         run: |
-          STATUS="${{ github.event.workflow_run.status }}"
-          CONCLUSION="${{ github.event.workflow_run.conclusion }}"
-          # Map GitHub terms to your Gen Z terms
-          if [ "$STATUS" == "requested" ]; then FINAL="building...";
-          elif [ "$CONCLUSION" == "success" ]; then FINAL="success";
-          else FINAL="cooked"; fi
+          # Get the last commit message and SHA
+          MSG=$(git log -1 --pretty=%s)
+          SHA=$(git rev-parse HEAD)
+          echo "{\"message\": \"$MSG\", \"status\": \"success\", \"sha\": \"$SHA\"}" > status.json
           
-          echo "{\"message\": \"${{ github.event.workflow_run.head_commit.message }}\", \"status\": \"$FINAL\", \"sha\": \"${{ github.event.workflow_run.head_sha }}\"}" > status.json
-          
-      - name: Commit change
+      - name: Commit and Push
         run: |
-          git config --global user.name 'StatusBot'
-          git config --global user.email 'bot@pixel.io'
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
           git add status.json
-          git commit -m "update live status [skip ci]"
+          git commit -m "update live status [skip ci]" || exit 0 # Don't error if nothing changed
           git push
