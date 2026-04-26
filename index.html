@@ -3,155 +3,168 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pixxella | Void</title>
+    <title>VernersPage</title>
     <style>
         :root {
-            --glow: #bc13fe;
-            --bg: #0a0212;
+            --void: #0a001a;
+            --indigo: #4b0082;
+            --neon: #8a2be2;
+            --text: #e0d0ff;
         }
 
         body {
-            background: var(--bg);
-            color: #fff;
-            font-family: 'Consolas', monospace; /* More "tech nerd" vibe */
+            background-color: var(--void);
+            color: var(--text);
+            font-family: 'Courier New', Courier, monospace; /* Hard-core coder vibe */
+            margin: 0;
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            margin: 0;
             overflow: hidden;
         }
 
-        /* Particles */
-        #particles {
-            position: fixed;
-            width: 100%;
-            height: 100%;
-            z-index: -1;
-        }
+            /* Scanline Effect - Makes it look like a real monitor, not an AI mockup */
+            body::before {
+                content: " ";
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100vw;
+                height: 100vh;
+                background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+                background-size: 100% 4px, 3px 100%;
+                z-index: 10;
+                pointer-events: none;
+            }
 
-        .card {
-            background: rgba(15, 5, 25, 0.8);
-            border: 2px solid var(--glow);
-            border-radius: 12px;
-            padding: 30px;
-            width: 380px;
-            text-align: center;
-            box-shadow: 0 0 20px rgba(188, 19, 254, 0.3);
+        .terminal {
+            width: 90%;
+            max-width: 500px;
+            background: #0d021f;
+            border: 1px solid var(--indigo);
+            padding: 20px;
+            box-shadow: 10px 10px 0px var(--indigo); /* Hard shadow, not soft glow */
             position: relative;
         }
 
+        .header {
+            background: var(--indigo);
+            color: white;
+            padding: 5px 10px;
+            margin: -20px -20px 20px -20px;
+            font-size: 0.8rem;
+            display: flex;
+            justify-content: space-between;
+        }
+
         h1 {
-            font-size: 2.2rem;
+            font-size: 1.5rem;
             margin: 0;
-            letter-spacing: 4px;
-            text-shadow: 2px 2px 0px var(--glow);
+            color: var(--neon);
+            text-transform: uppercase;
         }
 
-        /* THE IMAGE FIX */
-        .img-container {
+        /* FIXED STRETCHED IMAGE */
+        .image-box {
             width: 100%;
-            height: 70px; /* Force the squish */
-            margin: 20px 0;
+            height: 60px; /* Maximum cursed stretch */
+            background: #1a1a1a;
+            margin: 15px 0;
+            border: 1px dashed var(--neon);
             overflow: hidden;
-            border: 1px solid var(--glow);
-            background: #1a0b2e; /* Dark fallback background */
         }
 
-        .stretched-god {
+        .stretched {
             width: 100%;
             height: 100%;
-            object-fit: fill; /* The magic for stretching */
-            display: block;
+            object-fit: fill;
+            filter: grayscale(0.5) contrast(1.2) sepia(0.5) hue-rotate(250deg);
         }
 
         .links {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 20px;
         }
 
         .btn {
-            background: transparent;
-            border: 1px solid #444;
-            color: #fff;
-            padding: 12px;
+            border: 1px solid var(--neon);
+            padding: 10px;
+            text-align: center;
             text-decoration: none;
-            transition: 0.2s;
-            font-weight: bold;
+            color: var(--text);
+            font-size: 0.9rem;
+            transition: 0.1s;
         }
 
             .btn:hover {
-                border-color: var(--glow);
-                background: rgba(188, 19, 254, 0.1);
-                box-shadow: inset 0 0 10px var(--glow);
+                background: var(--neon);
+                color: white;
+                cursor: crosshair;
             }
 
-        .status {
-            font-size: 0.8rem;
-            color: var(--glow);
-            margin-bottom: 20px;
+        .full-width {
+            grid-column: span 2;
+        }
+
+        .glitch {
+            font-size: 0.7rem;
+            opacity: 0.5;
+            margin-top: 15px;
             display: block;
+        }
+
+        /* CRT Flicker */
+        @keyframes flicker {
+            0% {
+                opacity: 0.97;
+            }
+
+            5% {
+                opacity: 0.95;
+            }
+
+            10% {
+                opacity: 0.9;
+            }
+
+            100% {
+                opacity: 1;
+            }
+        }
+
+        .terminal {
+            animation: flicker 0.1s infinite;
         }
     </style>
 </head>
 <body>
 
-    <canvas id="particles"></canvas>
+    <div class="terminal">
+        <div class="header">
+            <span>STATUS: ACTIVE</span>
+            <span>USER: Verner</span>
+        </div>
 
-    <div class="card">
-        <h1>VERNER</h1>
-        <span class="status">SYSTEM_ACTIVE // STREAMING</span>
+        <h1>> VERNER_HUB</h1>
+        <p style="margin: 5px 0;">[Locating assets...] [Success]</p>
 
-        <div class="img-container">
+        <div class="image-box">
             <img src="https://www.roblox.com/headshot-thumbnail/image?userId=5252491078&width=420&height=420&format=png"
-                 class="stretched-god"
-                 onerror="this.src='https://via.placeholder.com/400x100/1a0b2e/bc13fe?text=IMAGE+LOADING...'">
+                 class="stretched"
+                 onerror="this.src='https://via.placeholder.com/400x100/0a001a/4b0082?text=MISSING_DATA'">
         </div>
 
         <div class="links">
-            <a href="https://www.roblox.com/users/5252491078/profile" class="btn">ROBLOX</a>
-            <a href="https://twitch.tv/Verner_Ww" class="btn">TWITCH</a>
-            <a href="#" class="btn">DISCORD</a>
+            <a href="https://www.roblox.com/users/5252491078/profile" class="btn">ROBLOX.EXE</a>
+            <a href="https://twitch.tv/Verner_Ww" class="btn">TWITCH.LNK</a>
+            <a href="#" class="btn full-width">DISCORD_INVITE (WIP)</a>
         </div>
+
+        <span class="glitch">-- system_v2026_authorized --</span>
     </div>
 
-    <script>
-        const canvas = document.getElementById('particles');
-        const ctx = canvas.getContext('2d');
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-        let particles = [];
-
-        class Particle {
-        constructor() {
-        this.x = Math.random() * canvas.width;
-        this.y = Math.random() * canvas.height;
-        this.size = Math.random() * 2;
-        this.speedY = Math.random() * 0.5 + 0.2;
-        }
-        update() {
-        this.y -= this.speedY;
-        if (this.y < 0) this.y = canvas.height;
-        }
-        draw() {
-        ctx.fillStyle = '#bc13fe';
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-        ctx.fill();
-        }
-        }
-
-        function init() {
-        for (let i = 0; i < 60; i++) particles.push(new Particle());
-        }
-
-        function animate() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        particles.forEach(p => { p.update(); p.draw(); });
-        requestAnimationFrame(animate);
-        }
-        init(); animate();
-    </script>
 </body>
 </html>
