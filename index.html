@@ -185,9 +185,8 @@
         </div>
 
         <div class="footer">
-            <div class="update-log">
-                <strong>updated:</strong> today or a couple days ago <br>
-                (new discord finally out!)
+            <div class="update-log" id="git-status">
+                <strong>status:</strong> fetching latest commit...
             </div>
 
             <div class="dm-section">
@@ -200,5 +199,39 @@
         </div>
     </div>
 
+    <script>
+        async function updateGitStatus() {
+        const repo = "pixxella/VernersIoPage";
+        const statusEl = document.getElementById('git-status');
+
+        try {
+        // 1. Get latest commit message
+        const commitRes = await fetch(`https://api.github.com/repos/${repo}/commits/master`);
+        const commitData = await commitRes.json();
+        const message = commitData.commit.message;
+        const date = new Date(commitData.commit.author.date).toLocaleDateString();
+
+        // 2. Get GitHub Actions build status
+        const runRes = await fetch(`https://api.github.com/repos/${repo}/actions/runs?per_page=1`);
+        const runData = await runRes.json();
+
+        let status = "pushed";
+        if (runData.workflow_runs.length > 0) {
+        const latestRun = runData.workflow_runs[0];
+        status = latestRun.status === "completed" ? latestRun.conclusion : "building...";
+        }
+
+        // 3. Inject into the page
+        statusEl.innerHTML = `
+        <strong>latest commit:</strong> "${message}"<br>
+        <strong>status:</strong> ${status} (${date})
+        `;
+        } catch (e) {
+        statusEl.innerHTML = "<strong>status:</strong> failed to load git info";
+        }
+        }
+
+        updateGitStatus();
+    </script>
 </body>
 </html>
