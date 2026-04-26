@@ -1,7 +1,7 @@
 ﻿<!DOCTYPE html>
 <html>
 <head>
-    <base target="_blank"
+    <base target="_blank">
     <title>verner</title>
     <style>
         body {
@@ -35,32 +35,85 @@
         .links {
             display: flex;
             flex-direction: column;
-            gap: 15px;
+            gap: 18px;
         }
 
+        /* Base Link Style */
         a {
             color: #fff;
             text-decoration: none;
-            border: 3px solid #333;
             padding: 18px;
             font-size: 1.3rem;
             text-align: center;
             font-weight: bold;
-            transition: 0.1s;
+            transition: 0.2s;
+            border: 4px solid; /* Thick borders for the colors */
+            background: #111;
         }
 
-            a:hover {
-                background: #a349a4;
-                border-color: #ffa2fd;
-                transform: translate(-5px, -5px);
-                box-shadow: 8px 8px 0px #5a2d82;
+        /* --- Individual Platform Colors --- */
+
+        /* Roblox: Grey / Silver / Red vibes, but usually simple White/Grey */
+        .roblox {
+            border-color: #ffffff #555555 #555555 #ffffff;
+        }
+
+            .roblox:hover {
+                box-shadow: 0 0 15px #ffffff;
             }
 
+        /* Twitch: Purple and Light Purple */
+        .twitch {
+            border-color: #9146FF #bf94ff #bf94ff #9146FF;
+        }
+
+            .twitch:hover {
+                box-shadow: 0 0 15px #9146FF;
+            }
+
+        /* TikTok: The Purple and Cyan split */
+        .tiktok {
+            border-image: linear-gradient(45deg, #ff0050, #00f2ea) 1;
+            border-width: 4px;
+        }
+
+            .tiktok:hover {
+                box-shadow: 0 0 15px #ff0050;
+            }
+
+        /* Discord: Blurple and Grey-Blue */
+        .discord {
+            border-color: #5865F2 #7289da #7289da #5865F2;
+        }
+
+            .discord:hover {
+                box-shadow: 0 0 15px #5865F2;
+            }
+
+        /* Private Server: Gold / Yellow for "VIP" feel */
+        .server {
+            border-color: #ffd700 #b8860b #b8860b #ffd700;
+        }
+
+            .server:hover {
+                box-shadow: 0 0 15px #ffd700;
+            }
+
+        /* Source Code: Dark Purple / Black */
         .src-link {
             border-color: #5a2d82;
             font-size: 1rem;
             margin-top: 10px;
             opacity: 0.8;
+        }
+
+            .src-link:hover {
+                opacity: 1;
+                border-color: #a366ff;
+            }
+
+        a:hover {
+            transform: translate(-5px, -5px);
         }
 
         .footer {
@@ -80,12 +133,12 @@
         <h1>verner's links</h1>
 
         <div class="links">
-            <a href="https://www.roblox.com/users/5252491078/profile" target="_blank" rel="noopener noreferrer">roblox</a>
-            <a href="https://twitch.tv/Verner_Ww" target="_blank" rel="noopener noreferrer">twitch</a>
-            <a href="https://tiktok.com/@Verner_W" target="_blank" rel="noopener noreferrer">tiktok</a>
-            <a href="https://discord.gg/ccGFawHpjQ" target="_blank" rel="noopener noreferrer">discord</a>
-            <a href="https://is.gd/votserv2/" target="_blank" rel="noopener noreferrer">private server</a>
-            <a href="https://github.com/pixxella/VernersIoPage" class="src-link" target="_blank" rel="noopener noreferrer">src code</a>
+            <a href="https://www.roblox.com/users/5252491078/profile" class="roblox">roblox</a>
+            <a href="https://twitch.tv/Verner_Ww" class="twitch">twitch</a>
+            <a href="https://tiktok.com/@Verner_W" class="tiktok">tiktok</a>
+            <a href="https://discord.gg/ccGFawHpjQ" class="discord">discord</a>
+            <a href="https://is.gd/votserv2/" class="server">private server</a>
+            <a href="https://github.com/pixxella/VernersIoPage" class="src-link">src code</a>
         </div>
 
         <div class="footer">
