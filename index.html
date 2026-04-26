@@ -1,6 +1,8 @@
 ﻿<!DOCTYPE html>
 <html>
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <base target="_blank">
     <title>verner</title>
     <style>
@@ -13,20 +15,23 @@
             align-items: center;
             min-height: 100vh;
             margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
         }
 
         .container {
             border: 4px solid #a349a4;
-            padding: 60px;
-            width: 600px;
+            padding: 40px;
+            width: 100%;
+            max-width: 600px;
             background: #151515;
-            box-shadow: 20px 20px 0px #a349a4;
-            margin: 20px;
+            box-shadow: 15px 15px 0px #a349a4;
+            box-sizing: border-box;
         }
 
         h1 {
-            font-size: 3rem;
-            margin: 0 0 30px 0;
+            font-size: clamp(2rem, 8vw, 3rem);
+            margin: 0 0 25px 0;
             color: #ffa2fd;
             text-transform: lowercase;
             letter-spacing: -2px;
@@ -35,25 +40,28 @@
         .links {
             display: flex;
             flex-direction: column;
-            gap: 18px;
+            gap: 15px;
         }
 
-        /* Base Link Style */
+        .link-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
         a {
             color: #fff;
             text-decoration: none;
-            padding: 18px;
-            font-size: 1.3rem;
+            padding: 15px;
+            font-size: 1.2rem;
             text-align: center;
             font-weight: bold;
-            transition: 0.2s;
-            border: 4px solid; /* Thick borders for the colors */
+            transition: 0.1s;
+            border: 4px solid;
             background: #111;
         }
 
-        /* --- Individual Platform Colors --- */
-
-        /* Roblox: Grey / Silver / Red vibes, but usually simple White/Grey */
+        /* --- Platform Colors --- */
         .roblox {
             border-color: #ffffff #555555 #555555 #ffffff;
         }
@@ -62,7 +70,6 @@
                 box-shadow: 0 0 15px #ffffff;
             }
 
-        /* Twitch: Purple and Light Purple */
         .twitch {
             border-color: #9146FF #bf94ff #bf94ff #9146FF;
         }
@@ -71,7 +78,6 @@
                 box-shadow: 0 0 15px #9146FF;
             }
 
-        /* TikTok: The Purple and Cyan split */
         .tiktok {
             border-image: linear-gradient(45deg, #ff0050, #00f2ea) 1;
             border-width: 4px;
@@ -81,7 +87,6 @@
                 box-shadow: 0 0 15px #ff0050;
             }
 
-        /* Discord: Blurple and Grey-Blue */
         .discord {
             border-color: #5865F2 #7289da #7289da #5865F2;
         }
@@ -90,7 +95,6 @@
                 box-shadow: 0 0 15px #5865F2;
             }
 
-        /* Private Server: Gold / Yellow for "VIP" feel */
         .server {
             border-color: #ffd700 #b8860b #b8860b #ffd700;
         }
@@ -99,31 +103,64 @@
                 box-shadow: 0 0 15px #ffd700;
             }
 
-        /* Source Code: Dark Purple / Black */
         .src-link {
             border-color: #5a2d82;
-            font-size: 1rem;
+            font-size: 0.9rem;
             margin-top: 10px;
-            opacity: 0.8;
+            opacity: 0.7;
         }
 
-            .src-link:hover {
-                opacity: 1;
-                border-color: #a366ff;
-            }
-
         a:hover {
-            transform: translate(-5px, -5px);
+            transform: translate(-3px, -3px);
+        }
+
+        /* --- Small Notice Style --- */
+        .notice {
+            font-size: 0.7rem;
+            color: #ffd700;
+            opacity: 0.8;
+            text-align: center;
+            font-style: italic;
         }
 
         .footer {
-            margin-top: 50px;
-            font-size: 0.9rem;
-            opacity: 0.6;
-            text-align: left;
-            line-height: 1.5;
+            margin-top: 40px;
+            font-size: 0.85rem;
             border-top: 1px solid #333;
             padding-top: 20px;
+        }
+
+        .update-log {
+            opacity: 0.6;
+            margin-bottom: 20px;
+            line-height: 1.4;
+        }
+
+        .dm-section {
+            background: #1e0a2d;
+            padding: 10px;
+            border-left: 3px solid #ffa2fd;
+            margin-bottom: 20px;
+        }
+
+        .copyright {
+            font-size: 0.75rem;
+            opacity: 0.4;
+            text-align: center;
+            border-top: 1px solid #222;
+            padding-top: 15px;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 25px;
+                box-shadow: 8px 8px 0px #a349a4;
+            }
+
+            a {
+                padding: 12px;
+                font-size: 1rem;
+            }
         }
     </style>
 </head>
@@ -137,14 +174,29 @@
             <a href="https://twitch.tv/Verner_Ww" class="twitch">twitch</a>
             <a href="https://tiktok.com/@Verner_W" class="tiktok">tiktok</a>
             <a href="https://discord.gg/ccGFawHpjQ" class="discord">discord</a>
-            <a href="https://is.gd/votserv2/" class="server">private server</a>
+
+            <div class="link-group">
+                <a href="https://is.gd/votserv2/" class="server">private server</a>
+                <span class="notice">may not work; tell us in stream. will be fixed fast</span>
+            </div>
+
             <a href="https://github.com/pixxella/VernersIoPage" class="src-link">src code</a>
         </div>
 
         <div class="footer">
-            <strong>updated:</strong> 2026-04-26<br>
-            private server link may be expired & fixed fast in the future<br>
-            (discord finally out!)
+            <div class="update-log">
+                <strong>updated:</strong> today or a couple days ago<br>
+                (discord finally out!)<br>
+                
+            </div>
+
+            <div class="dm-section">
+                <strong>DMS:</strong> vernerz1, pxlzfr (verner & head mod)
+            </div>
+
+            <div class="copyright">
+                © Copyright 2026 The Huge nPixelz™<br>All rights reserved®
+            </div>
         </div>
     </div>
 
