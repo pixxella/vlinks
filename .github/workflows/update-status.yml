@@ -1,7 +1,7 @@
 name: Update Status JSON
 on:
   push: # Triggering on push is easier for testing
-    branches: [main]
+    branches: [master]
 
 permissions:
   contents: write # This tells GitHub the bot has permission to write files
