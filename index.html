@@ -203,7 +203,7 @@
         async function fetchStatus() {
         try {
         // We add ?t= to the end so the browser doesn't cache the old version
-        const res = await fetch('./status.json?t=' + Date.now());
+        const res = await fetch('https://pixxella.github.io/VernersIoPage/status.json?t=' + Date.now());
         if (!res.ok) throw new Error('Not found');
         const data = await res.json();
 
