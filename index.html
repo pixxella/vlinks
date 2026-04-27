@@ -175,12 +175,26 @@
             }
             /* Allow wrap only on tiny phones */
         }
+
+        #dev-badge {
+            display: none; /* Hidden for everyone else */
+            background: #ffa2fd;
+            color: #0d0d0d;
+            font-size: 0.65rem;
+            padding: 2px 6px;
+            border-radius: 3px;
+            margin-left: 8px;
+            vertical-align: middle;
+            font-weight: 900;
+            text-transform: uppercase;
+        }
+                
     </style>
 </head>
 <body>
 
     <div class="container">
-        <h1>Verner's links</h1>
+        <h1>Verner's links <span id="dev-badge">Dev</span></h1>
 
         <div class="links">
             <a href="https://www.roblox.com/users/5252491078/profile" class="roblox">Roblox</a>
@@ -218,6 +232,33 @@
             </div>
         </div>
     </div>
+
+    <script>
+        
+        // Wait for the page to actually load so nothing is "undefined"
+        document.addEventListener('DOMContentLoaded', () => {
+        const badge = document.getElementById('dev-flag');
+
+        // Check persistence
+        if (localStorage.getItem('isDev') === 'true' && badge) {
+        badge.style.display = 'inline-block';
+        }
+
+        // Define the command globally
+        window.setDev = (status) => {
+        if (status === true) {
+        localStorage.setItem('isDev', 'true');
+        console.log("%c [!] DEV MODE ENABLED ", "color: #ffa2fd; font-weight: bold;");
+        location.reload();
+        } else {
+        localStorage.removeItem('isDev');
+        console.log("Dev mode disabled.");
+        location.reload();
+        }
+        };
+        });
+
+    </script>
 
 </body>
 </html>
