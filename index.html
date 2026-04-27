@@ -15,48 +15,49 @@
             align-items: center;
             min-height: 100vh;
             margin: 0;
-            padding: 10px;
+            padding: 15px;
             box-sizing: border-box;
-            overflow: hidden; /* Prevents stray scrollbars on 1080p */
+            overflow-y: auto;
         }
 
         .container {
             border: 4px solid #a349a4;
-            padding: 15px 30px; /* Tightened vertical padding */
+            padding: 25px 40px; /* Scaled down slightly */
             width: 100%;
-            max-width: 500px; /* Optimal width for 1080p */
+            max-width: 600px; /* 90-95% of previous width */
             background: #151515;
-            box-shadow: 10px 10px 0px #a349a4;
+            box-shadow: 12px 12px 0px #a349a4;
             box-sizing: border-box;
             display: flex;
             flex-direction: column;
         }
 
         h1 {
-            font-size: 2.2rem;
-            margin: 0 0 10px 0;
+            font-size: 2.4rem; /* Scaled down */
+            margin: 0 0 18px 0;
             color: #ffa2fd;
             text-transform: lowercase;
             text-align: center;
+            letter-spacing: -1px;
         }
 
         .links {
             display: flex;
             flex-direction: column;
-            gap: 8px; /* Compact gap to fit everything */
+            gap: 12px; /* Tighter gap */
         }
 
         .link-group {
             display: flex;
             flex-direction: column;
-            gap: 2px;
+            gap: 4px;
         }
 
         a {
             color: #fff;
             text-decoration: none;
-            padding: 10px;
-            font-size: 1rem;
+            padding: 14px; /* Scaled down padding */
+            font-size: 1.1rem; /* Scaled down font */
             text-align: center;
             font-weight: bold;
             transition: 0.1s;
@@ -98,21 +99,21 @@
 
         .src-link {
             border-color: #f3b4ff;
-            font-size: 0.75rem;
+            font-size: 0.85rem;
             opacity: 0.6;
-            margin-top: 5px;
+            margin-top: 4px;
         }
 
         a:hover {
-            transform: translate(-2px, -2px);
+            transform: translate(-3px, -3px);
             filter: brightness(1.2);
         }
 
         .notice {
-            font-size: 0.6rem;
+            font-size: 0.7rem;
             text-align: center;
             font-weight: bold;
-            line-height: 1.1;
+            line-height: 1.2;
         }
 
         .gold-text {
@@ -124,31 +125,46 @@
         }
 
         .footer {
-            margin-top: 15px;
+            margin-top: 20px;
             border-top: 1px solid #333;
-            padding-top: 10px;
+            padding-top: 15px;
         }
 
         .update-log {
-            font-size: 0.7rem;
+            font-size: 0.8rem;
             opacity: 0.6;
-            margin-bottom: 8px;
+            margin-bottom: 10px;
         }
 
         .dm-section {
             background: #1e0a2d;
-            padding: 6px 10px;
+            padding: 10px 15px;
             border-left: 4px solid #ffa2fd;
-            margin-bottom: 10px;
-            font-size: 0.75rem;
+            margin-bottom: 12px;
+            font-size: 0.85rem;
         }
 
         .copyright {
-            font-size: 0.65rem;
+            font-size: 0.75rem;
             opacity: 0.4;
             text-align: center;
             border-top: 1px solid #222;
-            padding-top: 8px;
+            padding-top: 10px;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            a {
+                padding: 12px;
+                font-size: 1rem;
+            }
         }
     </style>
 </head>
@@ -166,12 +182,12 @@
 
             <div class="link-group">
                 <a href="https://is.gd/votserv2/" class="server-vip">private server</a>
-                <span class="notice gold-text">may not work; tell us in stream. will be fixed if pixel is online.</span>
+                <span class="notice gold-text">may not work; tell us in stream. fixed if pixel is online.</span>
             </div>
 
             <div class="link-group">
                 <a href="#" class="server-current">current server</a>
-                <span class="notice green-text">if it doesnt work notify us, rarely works. fixed if pixel is online.</span>
+                <span class="notice green-text">if it doesnt work notify us. fixed if pixel is online.</span>
             </div>
 
             <a href="https://github.com/pixxella/VernersIoPage" class="src-link">website source code</a>
