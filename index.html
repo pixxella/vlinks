@@ -17,23 +17,24 @@
             margin: 0;
             padding: 10px;
             box-sizing: border-box;
+            overflow: hidden; /* Prevents stray scrollbars on 1080p */
         }
 
         .container {
             border: 4px solid #a349a4;
-            padding: 20px 30px;
+            padding: 15px 30px; /* Tightened vertical padding */
             width: 100%;
-            max-width: 550px;
+            max-width: 500px; /* Optimal width for 1080p */
             background: #151515;
-            box-shadow: 12px 12px 0px #a349a4;
+            box-shadow: 10px 10px 0px #a349a4;
             box-sizing: border-box;
             display: flex;
             flex-direction: column;
         }
 
         h1 {
-            font-size: clamp(1.5rem, 6vw, 2.5rem);
-            margin: 0 0 15px 0;
+            font-size: 2.2rem;
+            margin: 0 0 10px 0;
             color: #ffa2fd;
             text-transform: lowercase;
             text-align: center;
@@ -42,20 +43,20 @@
         .links {
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 8px; /* Compact gap to fit everything */
         }
 
         .link-group {
             display: flex;
             flex-direction: column;
-            gap: 3px;
+            gap: 2px;
         }
 
         a {
             color: #fff;
             text-decoration: none;
-            padding: 12px;
-            font-size: 1.1rem;
+            padding: 10px;
+            font-size: 1rem;
             text-align: center;
             font-weight: bold;
             transition: 0.1s;
@@ -66,6 +67,10 @@
         /* --- Colors --- */
         .roblox {
             border-color: #fff #555 #555 #fff;
+        }
+
+        .youtube {
+            border-color: #FF0000 #8b0000 #8b0000 #FF0000;
         }
 
         .twitch {
@@ -93,19 +98,21 @@
 
         .src-link {
             border-color: #f3b4ff;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             opacity: 0.6;
+            margin-top: 5px;
         }
 
         a:hover {
             transform: translate(-2px, -2px);
+            filter: brightness(1.2);
         }
 
         .notice {
-            font-size: 0.65rem;
+            font-size: 0.6rem;
             text-align: center;
             font-weight: bold;
-            line-height: 1;
+            line-height: 1.1;
         }
 
         .gold-text {
@@ -117,45 +124,31 @@
         }
 
         .footer {
-            margin-top: 20px;
+            margin-top: 15px;
             border-top: 1px solid #333;
-            padding-top: 15px;
+            padding-top: 10px;
         }
 
         .update-log {
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             opacity: 0.6;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
         }
 
         .dm-section {
             background: #1e0a2d;
-            padding: 8px;
+            padding: 6px 10px;
             border-left: 4px solid #ffa2fd;
-            margin-bottom: 15px;
-            font-size: 0.8rem;
+            margin-bottom: 10px;
+            font-size: 0.75rem;
         }
 
         .copyright {
-            font-size: 0.7rem;
+            font-size: 0.65rem;
             opacity: 0.4;
             text-align: center;
             border-top: 1px solid #222;
-            padding-top: 10px;
-        }
-
-        @media (max-height: 700px) {
-            .container {
-                padding: 15px;
-            }
-
-            h1 {
-                margin-bottom: 10px;
-            }
-
-            .footer {
-                margin-top: 10px;
-            }
+            padding-top: 8px;
         }
     </style>
 </head>
@@ -166,6 +159,7 @@
 
         <div class="links">
             <a href="https://www.roblox.com/users/5252491078/profile" class="roblox">roblox</a>
+            <a href="https://youtube.com/@Verner_W" class="youtube">youtube</a>
             <a href="https://twitch.tv/Verner_Ww" class="twitch">twitch</a>
             <a href="https://tiktok.com/@Verner_W" class="tiktok">tiktok</a>
             <a href="https://discord.gg/ccGFawHpjQ" class="discord">discord</a>
@@ -177,7 +171,7 @@
 
             <div class="link-group">
                 <a href="#" class="server-current">current server</a>
-                <span class="notice green-text">if it doesnt work notify us, rarely works. will be fixed if pixel is online.</span>
+                <span class="notice green-text">if it doesnt work notify us, rarely works. fixed if pixel is online.</span>
             </div>
 
             <a href="https://github.com/pixxella/VernersIoPage" class="src-link">website source code</a>
@@ -185,8 +179,8 @@
 
         <div class="footer">
             <div class="update-log">
-                <strong>logs:</strong> removed the evity patch <br>
-                <strong>updated:</strong> today or a couple days ago
+                <strong>logs:</strong> removed the evity patch<br>
+                <strong>updated:</strong> 2026-04-27
             </div>
 
             <div class="dm-section">
@@ -198,5 +192,6 @@
             </div>
         </div>
     </div>
+
 </body>
 </html>
