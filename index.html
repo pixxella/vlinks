@@ -17,14 +17,37 @@
             margin: 0;
             padding: 10px;
             box-sizing: border-box;
-            overflow: hidden; /* Hard fit for 100% size */
+            overflow: hidden;
+            transition: border 0.3s ease;
+            border: 4px solid transparent;
+        }
+
+        @keyframes devPulse {
+            0% {
+                border-color: #a349a4;
+                box-shadow: inset 0 0 10px #a349a4;
+            }
+
+            50% {
+                border-color: #ffa2fd;
+                box-shadow: inset 0 0 20px #ffa2fd;
+            }
+
+            100% {
+                border-color: #a349a4;
+                box-shadow: inset 0 0 10px #a349a4;
+            }
+        }
+
+        .dev-mode-active {
+            animation: devPulse 2s infinite ease-in-out;
         }
 
         .container {
             border: 4px solid #a349a4;
             padding: 20px 35px;
             width: 100%;
-            max-width: 620px; /* Slightly wider to fit the one-liner */
+            max-width: 620px;
             background: #151515;
             box-shadow: 12px 12px 0px #a349a4;
             box-sizing: border-box;
@@ -65,7 +88,6 @@
             background: #111;
         }
 
-        /* --- Colors --- */
         .roblox {
             border-color: #fff #555 #555 #fff;
         }
@@ -138,7 +160,6 @@
         }
 
         .one-liner {
-            white-space: nowrap; /* Forces the flex on one line */
             display: block;
             margin-top: 4px;
             font-style: italic;
@@ -161,23 +182,8 @@
             padding-top: 8px;
         }
 
-        @media (max-width: 600px) {
-            .container {
-                padding: 15px;
-            }
-
-            h1 {
-                font-size: 1.8rem;
-            }
-
-            .one-liner {
-                white-space: normal;
-            }
-            /* Allow wrap only on tiny phones */
-        }
-
         #dev-badge {
-            display: none; /* Hidden for everyone else */
+            display: none;
             background: #ffa2fd;
             color: #0d0d0d;
             font-size: 0.65rem;
@@ -188,7 +194,16 @@
             font-weight: 900;
             text-transform: uppercase;
         }
-                
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 15px;
+            }
+
+            h1 {
+                font-size: 1.8rem;
+            }
+        }
     </style>
 </head>
 <body>
@@ -197,19 +212,19 @@
         <h1>Verner's links <span id="dev-badge">Dev</span></h1>
 
         <div class="links">
-            <a href="https://www.roblox.com/users/5252491078/profile" class="roblox">Roblox</a>
-            <a href="https://youtube.com/@Verner_W" class="youtube">YouTube</a>
-            <a href="https://twitch.tv/Verner_Ww" class="twitch">Twitch</a>
-            <a href="https://tiktok.com/@Verner_W" class="tiktok">TikTok</a>
-            <a href="https://discord.gg/ccGFawHpjQ" class="discord">Discord</a>
+            <a href="#" id="link-roblox" class="roblox">Roblox</a>
+            <a href="#" id="link-youtube" class="youtube">YouTube</a>
+            <a href="#" id="link-twitch" class="twitch">Twitch</a>
+            <a href="#" id="link-tiktok" class="tiktok">TikTok</a>
+            <a href="#" id="link-discord" class="discord">Discord</a>
 
             <div class="link-group">
-                <a href="https://is.gd/votserv2/" class="server-vip">Private server</a>
+                <a href="#" id="live-vip" class="server-vip">Private server</a>
                 <span class="notice gold-text">may not work; tell us in stream. fixed if pixel is online.</span>
             </div>
 
             <div class="link-group">
-                <a href="#" class="server-current">Current server (doesn't work.)</a>
+                <a href="#" id="live-current" class="server-current">Current server</a>
                 <span class="notice green-text">if it doesnt work notify us. fixed if pixel is online.</span>
             </div>
 
@@ -218,7 +233,7 @@
 
         <div class="footer">
             <div class="update-log">
-                <strong>logs:</strong> added captialization, and added doesn't work to current server.<br>
+                <strong>logs:</strong> <span id="log-text">fetching latest logs...</span><br>
                 <strong>updated:</strong> 2026-04-27<br>
                 <span class="one-liner"><strong>made by pxlzfr (nPixelz)</strong> - "i'm the one developing this-" -pixel</span>
             </div>
@@ -233,32 +248,73 @@
         </div>
     </div>
 
-    <script>
-        
-        // Wait for the page to actually load so nothing is "undefined"
-        document.addEventListener('DOMContentLoaded', () => {
-        const badge = document.getElementById('dev-flag');
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
+        import { getDatabase, ref, onValue, set } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-database.js";
 
-        // Check persistence
-        if (localStorage.getItem('isDev') === 'true' && badge) {
-        badge.style.display = 'inline-block';
-        }
-
-        // Define the command globally
-        window.setDev = (status) => {
-        if (status === true) {
-        localStorage.setItem('isDev', 'true');
-        console.log("%c [!] DEV MODE ENABLED ", "color: #ffa2fd; font-weight: bold;");
-        location.reload();
-        } else {
-        localStorage.removeItem('isDev');
-        console.log("Dev mode disabled.");
-        location.reload();
-        }
+        const firebaseConfig = {
+        apiKey: "AIzaSyASdvWuvLUUm7-oU4qRBK2vhIVMWCtJkFc",
+        authDomain: "vlinks-backend.firebaseapp.com",
+        projectId: "vlinks-backend",
+        storageBucket: "vlinks-backend.firebasestorage.app",
+        messagingSenderId: "1054304746220",
+        appId: "1:1054304746220:web:758c6a365191abe4ce03c9",
+        databaseURL: "https://vlinks-backend-default-rtdb.europe-west1.firebasedatabase.app"
         };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        // --- ELEMENTS ---
+        const badge = document.getElementById('dev-badge');
+        const elements = {
+        vip: document.getElementById('live-vip'),
+        current: document.getElementById('live-current'),
+        roblox: document.getElementById('link-roblox'),
+        youtube: document.getElementById('link-youtube'),
+        twitch: document.getElementById('link-twitch'),
+        tiktok: document.getElementById('link-tiktok'),
+        discord: document.getElementById('link-discord'),
+        logs: document.getElementById('log-text')
+        };
+
+        // --- LISTENERS ---
+        Object.keys(elements).forEach(key => {
+        onValue(ref(db, `vlinks/${key}`), (snapshot) => {
+        const data = snapshot.val();
+        if (data) {
+        if (key === 'logs') elements[key].innerText = data;
+        else elements[key].href = data;
+        }
+        });
         });
 
-    </script>
+        // --- DEV CHECK ---
+        if (localStorage.getItem('isDev') === 'true') {
+        if (badge) badge.style.display = 'inline-block';
+        document.body.classList.add('dev-mode-active');
+        console.log("%c Welcome back, Bruno. All systems nominal. ", "color: #ffa2fd; font-weight: bold;");
+        }
 
+        // --- COMMANDS ---
+        window.setDev = (status) => {
+        status ? localStorage.setItem('isDev', 'true') : localStorage.removeItem('isDev');
+        location.reload();
+        };
+
+        const updateData = (path, val) => {
+        if (localStorage.getItem('isDev') !== 'true') return console.error("Access Denied.");
+        set(ref(db, `vlinks/${path}`), val).then(() => {
+        console.log(`%c [!] ${path.toUpperCase()} UPDATED GLOBALLY `, "color: #ffa2fd; font-weight: bold;");
+        });
+        };
+
+        window.updateVIP = (url) => updateData('vip', url);
+        window.updateCurrent = (url) => updateData('current', url);
+        window.setLog = (msg) => updateData('logs', msg);
+        window.updateSocials = (plat, url) => updateData(plat.toLowerCase(), url);
+
+        console.log("Commands loaded: updateVIP(url), updateCurrent(url), setLog(text), updateSocials(platform, url)");
+    </script>
 </body>
 </html>
