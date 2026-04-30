@@ -5,6 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <base target="_blank">
     <title>vLinks</title>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700;900&display=swap" rel="stylesheet">
+
+    <script>
+        const savedTheme = localStorage.getItem('vTheme') || 'pink';
+        document.documentElement.setAttribute('data-theme', savedTheme);
+    </script>
+
     <style>
         :root {
             --primary: #ffa2fd;
@@ -26,23 +33,120 @@
             --secondary: #008f11;
         }
 
+        /* Enforce font everywhere */
+        * {
+            font-family: 'JetBrains Mono', monospace !important;
+            box-sizing: border-box;
+        }
+
+        @keyframes devPulse {
+            0% {
+                border-color: var(--secondary);
+                box-shadow: inset 0 0 10px var(--secondary);
+            }
+
+            50% {
+                border-color: var(--primary);
+                box-shadow: inset 0 0 20px var(--primary);
+            }
+
+            100% {
+                border-color: var(--secondary);
+                box-shadow: inset 0 0 10px var(--secondary);
+            }
+        }
+
         body {
             background: #0d0d0d;
             color: #eeeeee;
-            font-family: 'JetBrains Mono', monospace;
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
             margin: 0;
             padding: 10px;
-            box-sizing: border-box;
             overflow: hidden;
             transition: border 0.3s ease;
             border: 4px solid transparent;
+            animation: devPulse 4s infinite ease-in-out;
+            position: relative;
         }
 
-        /* Maintenance Screen */
+        /* Floating Dev Text System */
+        #dev-particles {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            overflow: hidden;
+            z-index: 0;
+        }
+
+        .dev-floater {
+            position: absolute;
+            color: var(--primary);
+            opacity: 0.15;
+            font-weight: 900;
+            font-size: 1.2rem;
+            animation: drift linear infinite alternate;
+        }
+
+        @keyframes drift {
+            0% {
+                transform: translateY(0px) translateX(0px) rotate(-10deg);
+            }
+
+            100% {
+                transform: translateY(-80px) translateX(50px) rotate(15deg);
+            }
+        }
+
+        /* Welcome Blur/Fade Animation */
+        #welcome-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: #0d0d0d;
+            z-index: 50000;
+            justify-content: center;
+            align-items: center;
+            color: var(--primary);
+            font-size: 3rem;
+            font-weight: bold;
+            text-transform: lowercase;
+            letter-spacing: 2px;
+        }
+
+        .blur-fade-anim {
+            animation: blurFade 2.5s ease-in-out forwards;
+        }
+
+        @keyframes blurFade {
+            0% {
+                opacity: 0;
+                filter: blur(25px);
+                transform: scale(0.8);
+            }
+
+            30% {
+                opacity: 1;
+                filter: blur(0px);
+                transform: scale(1.05);
+            }
+
+            70% {
+                opacity: 1;
+                filter: blur(0px);
+                transform: scale(1);
+            }
+
+            100% {
+                opacity: 0;
+                filter: blur(20px);
+                transform: scale(1.3);
+            }
+        }
+
+        /* Screens & Modals */
         #maint-screen {
             display: none;
             position: fixed;
@@ -55,8 +159,7 @@
             color: var(--primary);
         }
 
-        /* Custom Auth Modal */
-        #auth-modal {
+        .modal-overlay {
             display: none;
             position: fixed;
             inset: 0;
@@ -66,7 +169,7 @@
             align-items: center;
         }
 
-        .auth-box {
+        .modal-box {
             background: #151515;
             border: 3px solid var(--primary);
             padding: 25px;
@@ -75,36 +178,36 @@
             flex-direction: column;
             gap: 15px;
             text-align: center;
-            width: 250px;
+            width: 300px;
+            max-width: 90vw;
         }
 
-            .auth-box input {
+            .modal-box input, .modal-box textarea {
                 background: #000;
                 color: #fff;
                 border: 1px solid #444;
                 padding: 10px;
-                font-family: inherit;
                 text-align: center;
+                resize: none;
             }
 
-                .auth-box input:focus {
+                .modal-box input:focus, .modal-box textarea:focus {
                     border-color: var(--primary);
                     outline: none;
                 }
 
-            .auth-box .btn-row {
-                display: flex;
-                gap: 10px;
-            }
+        .btn-row {
+            display: flex;
+            gap: 10px;
+        }
 
-            .auth-box button {
-                flex: 1;
-                border: none;
-                padding: 10px;
-                font-weight: bold;
-                cursor: pointer;
-                font-family: inherit;
-            }
+        .modal-box button {
+            flex: 1;
+            border: none;
+            padding: 10px;
+            font-weight: bold;
+            cursor: pointer;
+        }
 
         /* Custom Toast Notification */
         #toast {
@@ -158,6 +261,8 @@
             z-index: 10000;
             box-shadow: 8px 8px 0px var(--secondary);
             width: 250px;
+            max-height: 90vh;
+            overflow-y: auto;
         }
 
             #admin-panel label {
@@ -165,6 +270,7 @@
                 display: block;
                 margin-bottom: 4px;
                 color: #aaa;
+                margin-top: 8px;
             }
 
             #admin-panel select, #admin-panel input {
@@ -174,8 +280,6 @@
                 border: 1px solid #444;
                 padding: 8px;
                 margin-bottom: 12px;
-                font-family: inherit;
-                box-sizing: border-box;
             }
 
                 #admin-panel select:focus, #admin-panel input:focus {
@@ -191,16 +295,13 @@
             padding: 10px;
             font-weight: bold;
             cursor: pointer;
-            font-family: inherit;
             margin-bottom: 5px;
         }
 
-        /* Quick Status Grid */
         .status-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 5px;
-            margin-bottom: 12px;
         }
 
             .status-grid button {
@@ -208,7 +309,6 @@
                 padding: 6px;
                 font-weight: bold;
                 cursor: pointer;
-                font-family: inherit;
                 font-size: 0.65rem;
             }
 
@@ -222,27 +322,6 @@
             color: #fff;
         }
 
-        @keyframes devPulse {
-            0% {
-                border-color: var(--secondary);
-                box-shadow: inset 0 0 10px var(--secondary);
-            }
-
-            50% {
-                border-color: var(--primary);
-                box-shadow: inset 0 0 20px var(--primary);
-            }
-
-            100% {
-                border-color: var(--secondary);
-                box-shadow: inset 0 0 10px var(--secondary);
-            }
-        }
-
-        .dev-mode-active {
-            animation: devPulse 2s infinite ease-in-out;
-        }
-
         .container {
             position: relative;
             border: 4px solid var(--secondary);
@@ -251,9 +330,9 @@
             max-width: 620px;
             background: #151515;
             box-shadow: 12px 12px 0px var(--secondary);
-            box-sizing: border-box;
             display: flex;
             flex-direction: column;
+            z-index: 10;
         }
 
         #theme-dot {
@@ -267,7 +346,6 @@
             border: none;
             cursor: pointer;
             box-shadow: 0 0 8px var(--primary);
-            z-index: 10;
         }
 
         h1 {
@@ -340,10 +418,16 @@
         }
 
         .src-link {
-            border-color: #f3b4ff;
+            border-color: var(--primary);
             font-size: 0.8rem;
             opacity: 0.6;
             margin-top: 5px;
+            background: transparent;
+            color: #fff;
+            cursor: pointer;
+            padding: 8px;
+            border-style: dashed;
+            flex: 1;
         }
 
         .status {
@@ -390,6 +474,13 @@
             line-height: 1.5;
         }
 
+        .btn-row-small {
+            display: flex;
+            gap: 10px;
+            margin-top: 8px;
+            margin-bottom: 8px;
+        }
+
         .one-liner {
             display: block;
             margin-top: 4px;
@@ -403,6 +494,8 @@
             border-left: 4px solid var(--primary);
             margin-bottom: 10px;
             font-size: 0.8rem;
+            display: flex;
+            justify-content: space-between;
         }
 
         .copyright {
@@ -426,6 +519,20 @@
             text-transform: uppercase;
         }
 
+        /* Changelog List specific styles */
+        .log-entry {
+            border-bottom: 1px solid #333;
+            padding: 8px 0;
+            text-align: left;
+        }
+
+        .log-date {
+            color: var(--primary);
+            font-size: 0.65rem;
+            display: block;
+            margin-bottom: 2px;
+        }
+
         @media (max-width: 600px) {
             .container {
                 padding: 15px;
@@ -439,31 +546,59 @@
 </head>
 <body>
 
-    <!-- Notification Toast -->
-    <div id="toast">SYSTEM NOTIFICATION</div>
+    <div id="dev-particles"></div>
 
-    <!-- Maintenance Overlay -->
+    <div id="welcome-overlay">welcome dev.</div>
+    <div id="toast">SYSTEM NOTIFICATION</div>
     <div id="maint-screen"><h1>SYSTEM OFFLINE</h1><p>Verner is currently tweaking the code.</p></div>
 
-    <!-- Custom Auth Modal -->
-    <div id="auth-modal">
-        <div class="auth-box">
+    <div id="auth-modal" class="modal-overlay">
+        <div class="modal-box">
             <div style="color:var(--primary); font-weight:bold;">ENTER PASSKEY</div>
             <input type="password" id="auth-input" placeholder="••••••••">
             <div class="btn-row">
-                <button onclick="closeAuth()" style="background:#333; color:#fff;">CANCEL</button>
+                <button onclick="closeModal('auth-modal')" style="background:#333; color:#fff;">CANCEL</button>
                 <button onclick="submitAuth()" style="background:var(--primary); color:#000;">LOGIN</button>
             </div>
         </div>
     </div>
 
+    <div id="sugg-modal" class="modal-overlay">
+        <div class="modal-box">
+            <div style="color:var(--primary); font-weight:bold;">DROP A SUGGESTION</div>
+            <textarea id="sugg-input" rows="4" placeholder="what should we add..."></textarea>
+            <div class="btn-row">
+                <button onclick="closeModal('sugg-modal')" style="background:#333; color:#fff;">CANCEL</button>
+                <button onclick="submitSuggestion()" style="background:var(--primary); color:#000;">SEND IT</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="change-modal" class="modal-overlay">
+        <div class="modal-box" style="width: 400px; max-height: 60vh; overflow-y: auto;">
+            <div style="color:var(--primary); font-weight:bold; margin-bottom: 10px;">CHANGELOG</div>
+            <div id="changelog-list" style="font-size: 0.8rem;">
+            </div>
+            <button onclick="closeModal('change-modal')" style="background:#333; color:#fff; margin-top: 10px;">CLOSE</button>
+        </div>
+    </div>
+
+    <div id="admin-sugg-viewer" class="modal-overlay">
+        <div class="modal-box" style="width: 400px; max-height: 60vh; overflow-y: auto;">
+            <div style="color:var(--primary); font-weight:bold; margin-bottom: 10px;">USER SUGGESTIONS</div>
+            <div id="admin-sugg-list" style="font-size: 0.8rem;">
+            </div>
+            <button onclick="closeModal('admin-sugg-viewer')" style="background:#333; color:#fff; margin-top: 10px;">CLOSE</button>
+        </div>
+    </div>
+
     <button id="auth-trigger" onclick="adminAuth()">[SYSTEM AUTH]</button>
 
-    <!-- Command Center -->
     <div id="admin-panel">
-        <div style="font-size:0.6rem; color:var(--primary); margin-bottom:10px;">USERS ACTIVE: <span id="user-count">1</span></div>
+        <div style="font-size:0.6rem; color:var(--primary); margin-bottom:5px;">USERS ACTIVE: <span id="user-count">1</span></div>
 
-        <!-- 1-Tap Quick Actions -->
+        <button class="dash-btn" onclick="openModal('admin-sugg-viewer')" style="background:var(--secondary); color:#fff; font-size: 0.75rem;">VIEW USER SUGGESTIONS</button>
+
         <label>VIP SERVER STATUS</label>
         <div class="status-grid">
             <button class="btn-up" onclick="setStatus('vipStatus', '(WORKING)')">UP</button>
@@ -476,24 +611,32 @@
             <button class="btn-down" onclick="setStatus('currentStatus', '(DOWN)')">DOWN</button>
         </div>
 
-        <!-- Database Push Tool -->
-        <label>TARGET DATA</label>
-        <select id="dev-target">
-            <option value="title">Main Title</option>
-            <option value="vip">Private Server URL</option>
-            <option value="current">Current Server URL</option>
-            <option value="roblox">Roblox URL</option>
-            <option value="youtube">YouTube URL</option>
-            <option value="twitch">Twitch URL</option>
-            <option value="tiktok">TikTok URL</option>
-            <option value="discord">Discord URL</option>
-            <option value="logs">Update Logs Text</option>
-        </select>
-        <input type="text" id="dev-input" placeholder="Value here...">
-        <button class="dash-btn" id="dev-push">PUSH TO DATABASE</button>
+        <div style="margin-top:15px; border-top: 1px dashed #444; padding-top:10px;">
+            <label style="color:#fff;">PUSH CHANGELOG UPDATE</label>
+            <input type="text" id="dev-change-input" placeholder="Fixed a bug...">
+            <button class="dash-btn" onclick="pushChangelog()" style="background:#fff; color:#000;">ADD CHANGELOG</button>
+        </div>
 
-        <button class="dash-btn" onclick="toggleMaint()" style="background:#ff0000; color:#fff;">TOGGLE MAINTENANCE</button>
-        <button class="dash-btn" onclick="setDev(false)" style="background:#333; color:#fff;">LOGOUT</button>
+        <div style="margin-top:10px; border-top: 1px dashed #444; padding-top:10px;">
+            <label>TARGET DATA (LINKS)</label>
+            <select id="dev-target">
+                <option value="title">Main Title</option>
+                <option value="vip">Private Server URL</option>
+                <option value="current">Current Server URL</option>
+                <option value="roblox">Roblox URL</option>
+                <option value="youtube">YouTube URL</option>
+                <option value="twitch">Twitch URL</option>
+                <option value="tiktok">TikTok URL</option>
+                <option value="discord">Discord URL</option>
+            </select>
+            <input type="text" id="dev-input" placeholder="Value here...">
+            <button class="dash-btn" id="dev-push">PUSH TO DATABASE</button>
+        </div>
+
+        <div style="margin-top:10px;">
+            <button class="dash-btn" onclick="toggleMaint()" style="background:#ff0000; color:#fff;">TOGGLE MAINTENANCE</button>
+            <button class="dash-btn" onclick="setDev(false)" style="background:#333; color:#fff;">LOGOUT</button>
+        </div>
     </div>
 
     <div class="container">
@@ -516,24 +659,30 @@
                 <a href="#" id="live-current" class="server-current">Current server <span id="cur-status" class="status"></span></a>
                 <span class="notice green-text">if it doesnt work notify us. fixed if pixel is online.</span>
             </div>
-
-            <a href="https://github.com/pixxella/VernersIoPage" class="src-link">website source code</a>
         </div>
 
         <div class="footer">
             <div class="update-log">
-                <strong>logs:</strong> <span id="log-text">syncing...</span><br>
-                <strong>updated:</strong> 2026-04-27<br>
+                <strong>latest update:</strong> <span id="latest-update-text" style="color: var(--primary);">fetching...</span><br>
+
+                <div class="btn-row-small">
+                    <button class="src-link" onclick="openModal('change-modal')">[CHANGELOG]</button>
+                    <button class="src-link" onclick="openModal('sugg-modal')">[SUGGESTIONS]</button>
+                </div>
+
                 <span class="one-liner"><strong>made by pxlzfr (nPixelz)</strong> - "i'm the one developing this-" -pixel</span>
             </div>
-            <div class="dm-section"><strong>DMS:</strong> vernerz1, pxlzfr (verner & head mod)</div>
+            <div class="dm-section">
+                <span><strong>DMS:</strong> vernerz1, pxlzfr</span>
+                <span style="color:var(--primary); font-weight:bold;">VISITS: <span id="total-visits">0</span></span>
+            </div>
             <div class="copyright">© Copyright 2026 The Huge nPixelz™ | All rights reserved ®</div>
         </div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
-        import { getDatabase, ref, onValue, set, onDisconnect, increment } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-database.js";
+        import { getDatabase, ref, onValue, set, onDisconnect, increment, push } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-database.js";
 
         const firebaseConfig = {
         apiKey: "AIzaSyASdvWuvLUUm7-oU4qRBK2vhIVMWCtJkFc",
@@ -549,7 +698,7 @@
         const db = getDatabase(app);
         const isDev = localStorage.getItem('isDev') === 'true';
 
-        // --- CUSTOM TOAST LOGIC ---
+        // --- GLOBAL UI HELPERS ---
         window.showToast = (msg) => {
         const toast = document.getElementById('toast');
         toast.innerText = msg;
@@ -557,12 +706,32 @@
         setTimeout(() => toast.classList.remove('show'), 3000);
         };
 
-        // --- THEME SYNC ---
+        window.openModal = (id) => document.getElementById(id).style.display = 'flex';
+        window.closeModal = (id) => document.getElementById(id).style.display = 'none';
+
+        // --- DEV PARTICLE SYSTEM (MORE + FASTER) ---
+        if (isDev) {
+        const particleContainer = document.getElementById('dev-particles');
+        for (let i = 0; i < 25; i++) { // Increased to 25 particles
+        let span = document.createElement('span');
+        span.innerText = '[DEV]';
+        span.className = 'dev-floater';
+        span.style.top = Math.random() * 100 + 'vh';
+        span.style.left = Math.random() * 100 + 'vw';
+        span.style.animationDuration = (3 + Math.random() * 4) + 's'; // Sped up animation
+        span.style.animationDelay = (Math.random() * 3) + 's';
+        particleContainer.appendChild(span);
+        }
+        }
+
+        // --- THEME SYNC WITH CACHING TO STOP FLICKER ---
         const themes = ["pink", "blue", "red", "green"];
-        let currentTheme = "pink";
+        let currentTheme = localStorage.getItem('vTheme') || "pink";
+
         onValue(ref(db, 'vlinks/theme'), (s) => {
         currentTheme = s.val() || "pink";
         document.documentElement.setAttribute('data-theme', currentTheme);
+        localStorage.setItem('vTheme', currentTheme); // Cache it so it loads fast next time
         });
         window.cycleTheme = () => { if (isDev) set(ref(db, 'vlinks/theme'), themes[(themes.indexOf(currentTheme) + 1) % themes.length]); };
 
@@ -580,45 +749,135 @@
         set(ref(db, `vlinks/${target}`), val).then(() => showToast(`[${target}] UPDATED`));
         };
 
-        // --- PRESENCE & MAINT ---
+        // --- PRESENCE & VISITS ---
         const presenceRef = ref(db, 'presence/count');
         set(presenceRef, increment(1));
         onDisconnect(presenceRef).set(increment(-1));
         onValue(presenceRef, s => { document.getElementById('user-count').innerText = s.val(); });
 
+        const visitsRef = ref(db, 'stats/totalVisits');
+        if (!sessionStorage.getItem('hasVisited')) {
+        set(visitsRef, increment(1));
+        sessionStorage.setItem('hasVisited', 'true');
+        }
+        onValue(visitsRef, s => {
+        document.getElementById('total-visits').innerText = s.val() || 0;
+        });
+
         onValue(ref(db, 'vlinks/maintenance'), s => {
         document.getElementById('maint-screen').style.display = (s.val() && !isDev) ? 'flex' : 'none';
         });
 
-        // --- LIVE SYNC ---
+        // --- LIVE SYNC LINKS ---
         const uiElements = {
         title: document.getElementById('live-title'), vip: document.getElementById('live-vip'),
         current: document.getElementById('live-current'), roblox: document.getElementById('link-roblox'),
         youtube: document.getElementById('link-youtube'), twitch: document.getElementById('link-twitch'),
-        tiktok: document.getElementById('link-tiktok'), discord: document.getElementById('link-discord'),
-        logs: document.getElementById('log-text')
+        tiktok: document.getElementById('link-tiktok'), discord: document.getElementById('link-discord')
         };
         Object.keys(uiElements).forEach(key => {
         onValue(ref(db, `vlinks/${key}`), (s) => {
         if (!s.val()) return;
-        if (key === 'logs' || key === 'title') uiElements[key].innerText = s.val();
+        if (key === 'title') uiElements[key].innerText = s.val();
         else uiElements[key].href = s.val();
         });
         });
 
+        // --- SUGGESTIONS LOGIC ---
+        window.submitSuggestion = () => {
+        const input = document.getElementById('sugg-input');
+        if (!input.value.trim()) return showToast("CANNOT SEND EMPTY SUGGESTION");
+
+        push(ref(db, 'vlinks/suggestions'), { text: input.value, time: Date.now() })
+        .then(() => {
+        showToast("SUGGESTION SENT TO DB");
+        input.value = "";
+        closeModal('sugg-modal');
+        });
+        };
+
+        // Admin Suggestions Viewer
+        if (isDev) {
+        onValue(ref(db, 'vlinks/suggestions'), (s) => {
+        const list = document.getElementById('admin-sugg-list');
+        list.innerHTML = "";
+        const suggs = s.val();
+        if (!suggs) {
+        list.innerHTML = "<div style='opacity:0.5;'>no suggestions yet...</div>";
+        return;
+        }
+        Object.values(suggs).reverse().forEach(sg => {
+        const dateString = new Date(sg.time).toLocaleDateString();
+        list.innerHTML += `
+        <div class="log-entry">
+        <span class="log-date" style="color:#00ff00;">[${dateString}]</span>
+        ${sg.text}
+        </div>
+        `;
+        });
+        });
+        }
+
+        // --- CHANGELOG LOGIC ---
+        onValue(ref(db, 'vlinks/changelogs'), (s) => {
+        const list = document.getElementById('changelog-list');
+        const latestTextSpan = document.getElementById('latest-update-text');
+        list.innerHTML = "";
+        const logs = s.val();
+
+        if (!logs) {
+        list.innerHTML = "<div style='opacity:0.5;'>no logs documented yet...</div>";
+        if(latestTextSpan) latestTextSpan.innerText = "no updates yet...";
+        return;
+        }
+
+        const logArray = Object.values(logs);
+
+        // Set the absolute latest update to the footer
+        if(latestTextSpan && logArray.length > 0) {
+        latestTextSpan.innerText = logArray[logArray.length - 1].text;
+        }
+
+        logArray.reverse().forEach(log => {
+        const dateString = new Date(log.time).toLocaleDateString();
+        list.innerHTML += `
+        <div class="log-entry">
+        <span class="log-date">[${dateString}]</span>
+        ${log.text}
+        </div>
+        `;
+        });
+        });
+
+        window.pushChangelog = () => {
+        const val = document.getElementById('dev-change-input').value;
+        if (!val.trim()) return showToast("ENTER A VALUE FIRST");
+
+        push(ref(db, 'vlinks/changelogs'), { text: val, time: Date.now() })
+        .then(() => {
+        showToast("CHANGELOG UPDATED");
+        document.getElementById('dev-change-input').value = "";
+        });
+        };
+
         // --- CUSTOM AUTH MODAL ---
         window.adminAuth = () => {
         if (isDev) { window.setDev(false); return; }
-        document.getElementById('auth-modal').style.display = 'flex';
+        openModal('auth-modal');
         };
-        window.closeAuth = () => document.getElementById('auth-modal').style.display = 'none';
+
         window.submitAuth = () => {
-        if (document.getElementById('auth-input').value === "99C2accessForDevDaddy") {
-        window.setDev(true);
+        if (document.getElementById('auth-input').value === "dev123") {
+        closeModal('auth-modal');
+        const overlay = document.getElementById('welcome-overlay');
+        overlay.style.display = 'flex';
+        overlay.classList.add('blur-fade-anim');
+
+        setTimeout(() => { window.setDev(true); }, 2500);
         } else {
         showToast("ACCESS DENIED");
         document.getElementById('auth-input').value = "";
-        closeAuth();
+        closeModal('auth-modal');
         }
         };
 
@@ -638,8 +897,15 @@
         // --- DASHBOARD ACTIONS ---
         document.getElementById('dev-push').onclick = () => {
         const target = document.getElementById('dev-target').value;
-        set(ref(db, `vlinks/${target}`), document.getElementById('dev-input').value)
-        .then(() => showToast(`DATA PUSHED SUCCESFULLY`));
+        const val = document.getElementById('dev-input').value;
+
+        if (!val.trim()) return showToast("ENTER A VALUE FIRST");
+
+        set(ref(db, `vlinks/${target}`), val)
+        .then(() => {
+        showToast(`DATA PUSHED SUCCESFULLY`);
+        document.getElementById('dev-input').value = "";
+        });
         };
 
         window.toggleMaint = () => {
