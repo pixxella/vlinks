@@ -793,6 +793,10 @@
         showToast("SUGGESTION SENT TO DB");
         input.value = "";
         closeModal('sugg-modal');
+        })
+        .catch((error) => {
+        alert("FIREBASE ERROR: " + error.message);
+        console.error("SUGGESTION PUSH ERROR:", error);
         });
         };
 
@@ -857,6 +861,10 @@
         .then(() => {
         showToast("CHANGELOG UPDATED");
         document.getElementById('dev-change-input').value = "";
+        })
+        .catch((error) => {
+        alert("FIREBASE ERROR: " + error.message);
+        console.error("CHANGELOG PUSH ERROR:", error);
         });
         };
 
@@ -905,6 +913,10 @@
         .then(() => {
         showToast(`DATA PUSHED SUCCESFULLY`);
         document.getElementById('dev-input').value = "";
+        })
+        .catch((error) => {
+        alert("FIREBASE ERROR: " + error.message);
+        console.error("DB PUSH ERROR:", error);
         });
         };
 
