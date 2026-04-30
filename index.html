@@ -712,13 +712,13 @@
         // --- DEV PARTICLE SYSTEM (MORE + FASTER) ---
         if (isDev) {
         const particleContainer = document.getElementById('dev-particles');
-        for (let i = 0; i < 25; i++) { // Increased to 25 particles
+        for (let i = 0; i < 25; i++) {
         let span = document.createElement('span');
         span.innerText = '[DEV]';
         span.className = 'dev-floater';
         span.style.top = Math.random() * 100 + 'vh';
         span.style.left = Math.random() * 100 + 'vw';
-        span.style.animationDuration = (3 + Math.random() * 4) + 's'; // Sped up animation
+        span.style.animationDuration = (3 + Math.random() * 4) + 's';
         span.style.animationDelay = (Math.random() * 3) + 's';
         particleContainer.appendChild(span);
         }
@@ -731,7 +731,7 @@
         onValue(ref(db, 'vlinks/theme'), (s) => {
         currentTheme = s.val() || "pink";
         document.documentElement.setAttribute('data-theme', currentTheme);
-        localStorage.setItem('vTheme', currentTheme); // Cache it so it loads fast next time
+        localStorage.setItem('vTheme', currentTheme);
         });
         window.cycleTheme = () => { if (isDev) set(ref(db, 'vlinks/theme'), themes[(themes.indexOf(currentTheme) + 1) % themes.length]); };
 
@@ -745,8 +745,13 @@
         onValue(ref(db, 'vlinks/vipStatus'), s => updateStatusText('vip-status', s.val() || '(DOWN)'));
         onValue(ref(db, 'vlinks/currentStatus'), s => updateStatusText('cur-status', s.val() || '(DOWN)'));
 
-        window.setStatus = (target, val) => {
-        set(ref(db, `vlinks/${target}`), val).then(() => showToast(`[${target}] UPDATED`));
+        window.setStatus = async (target, val) => {
+        try {
+        await set(ref(db, `vlinks/${target}`), val);
+        showToast(`[${target}] UPDATED`);
+        } catch (error) {
+        alert(`DB ERROR: ${error.message}`);
+        }
         };
 
         // --- PRESENCE & VISITS ---
@@ -784,20 +789,18 @@
         });
 
         // --- SUGGESTIONS LOGIC ---
-        window.submitSuggestion = () => {
+        window.submitSuggestion = async () => {
         const input = document.getElementById('sugg-input');
         if (!input.value.trim()) return showToast("CANNOT SEND EMPTY SUGGESTION");
 
-        push(ref(db, 'vlinks/suggestions'), { text: input.value, time: Date.now() })
-        .then(() => {
+        try {
+        await push(ref(db, 'vlinks/suggestions'), { text: input.value, time: Date.now() });
         showToast("SUGGESTION SENT TO DB");
         input.value = "";
         closeModal('sugg-modal');
-        })
-        .catch((error) => {
-        alert("FIREBASE ERROR: " + error.message);
-        console.error("SUGGESTION PUSH ERROR:", error);
-        });
+        } catch (error) {
+        alert(`DB ERROR: ${error.message}`);
+        }
         };
 
         // Admin Suggestions Viewer
@@ -837,7 +840,6 @@
 
         const logArray = Object.values(logs);
 
-        // Set the absolute latest update to the footer
         if(latestTextSpan && logArray.length > 0) {
         latestTextSpan.innerText = logArray[logArray.length - 1].text;
         }
@@ -853,19 +855,17 @@
         });
         });
 
-        window.pushChangelog = () => {
+        window.pushChangelog = async () => {
         const val = document.getElementById('dev-change-input').value;
         if (!val.trim()) return showToast("ENTER A VALUE FIRST");
 
-        push(ref(db, 'vlinks/changelogs'), { text: val, time: Date.now() })
-        .then(() => {
+        try {
+        await push(ref(db, 'vlinks/changelogs'), { text: val, time: Date.now() });
         showToast("CHANGELOG UPDATED");
         document.getElementById('dev-change-input').value = "";
-        })
-        .catch((error) => {
-        alert("FIREBASE ERROR: " + error.message);
-        console.error("CHANGELOG PUSH ERROR:", error);
-        });
+        } catch (error) {
+        alert(`DB ERROR: ${error.message}`);
+        }
         };
 
         // --- CUSTOM AUTH MODAL ---
@@ -902,27 +902,32 @@
         showToast("DEV MODE ACTIVE");
         }
 
-        // --- DASHBOARD ACTIONS ---
-        document.getElementById('dev-push').onclick = () => {
+        // --- DASHBOARD ACTIONS (REBUILT WITH ASYNC/AWAIT) ---
+        document.getElementById('dev-push').onclick = async () => {
         const target = document.getElementById('dev-target').value;
         const val = document.getElementById('dev-input').value;
 
         if (!val.trim()) return showToast("ENTER A VALUE FIRST");
 
-        set(ref(db, `vlinks/${target}`), val)
-        .then(() => {
+        try {
+        // Browser must wait for this to finish before showing toast
+        await set(ref(db, `vlinks/${target}`), val);
         showToast(`DATA PUSHED SUCCESFULLY`);
         document.getElementById('dev-input').value = "";
-        })
-        .catch((error) => {
-        alert("FIREBASE ERROR: " + error.message);
-        console.error("DB PUSH ERROR:", error);
-        });
+        } catch (error) {
+        // If Firebase rejects it, they get an alert
+        alert(`DB ERROR: ${error.message}`);
+        }
         };
 
         window.toggleMaint = () => {
-        onValue(ref(db, 'vlinks/maintenance'), s => {
-        set(ref(db, 'vlinks/maintenance'), !s.val()).then(() => showToast(`MAINTENANCE: ${!s.val() ? 'ON' : 'OFF'}`));
+        onValue(ref(db, 'vlinks/maintenance'), async s => {
+        try {
+        await set(ref(db, 'vlinks/maintenance'), !s.val());
+        showToast(`MAINTENANCE: ${!s.val() ? 'ON' : 'OFF'}`);
+        } catch (error) {
+        alert(`DB ERROR: ${error.message}`);
+        }
         }, {onlyOnce: true});
         };
     </script>
