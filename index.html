@@ -6,6 +6,26 @@
     <base target="_blank">
     <title>vLinks</title>
     <style>
+        :root {
+            --primary: #ffa2fd;
+            --secondary: #a349a4;
+        }
+
+        [data-theme="blue"] {
+            --primary: #a2d2ff;
+            --secondary: #5865F2;
+        }
+
+        [data-theme="red"] {
+            --primary: #ff4d4d;
+            --secondary: #8b0000;
+        }
+
+        [data-theme="green"] {
+            --primary: #47fd48;
+            --secondary: #008f11;
+        }
+
         body {
             background: #0d0d0d;
             color: #eeeeee;
@@ -22,20 +42,200 @@
             border: 4px solid transparent;
         }
 
+        /* Maintenance Screen */
+        #maint-screen {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: #000;
+            z-index: 20000;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: var(--primary);
+        }
+
+        /* Custom Auth Modal */
+        #auth-modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.85);
+            z-index: 30000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .auth-box {
+            background: #151515;
+            border: 3px solid var(--primary);
+            padding: 25px;
+            box-shadow: 8px 8px 0px var(--secondary);
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            text-align: center;
+            width: 250px;
+        }
+
+            .auth-box input {
+                background: #000;
+                color: #fff;
+                border: 1px solid #444;
+                padding: 10px;
+                font-family: inherit;
+                text-align: center;
+            }
+
+                .auth-box input:focus {
+                    border-color: var(--primary);
+                    outline: none;
+                }
+
+            .auth-box .btn-row {
+                display: flex;
+                gap: 10px;
+            }
+
+            .auth-box button {
+                flex: 1;
+                border: none;
+                padding: 10px;
+                font-weight: bold;
+                cursor: pointer;
+                font-family: inherit;
+            }
+
+        /* Custom Toast Notification */
+        #toast {
+            position: fixed;
+            top: 20px;
+            right: -300px;
+            background: var(--primary);
+            color: #000;
+            padding: 12px 20px;
+            font-weight: bold;
+            z-index: 40000;
+            font-size: 0.8rem;
+            border: 2px solid #fff;
+            box-shadow: 5px 5px 0px var(--secondary);
+            transition: right 0.3s ease-in-out;
+        }
+
+            #toast.show {
+                right: 20px;
+            }
+
+        /* Trigger Button */
+        #auth-trigger {
+            position: fixed;
+            top: 15px;
+            left: 15px;
+            background: #111;
+            border: 1px solid #333;
+            color: #444;
+            padding: 5px 10px;
+            font-size: 0.6rem;
+            cursor: pointer;
+            z-index: 10001;
+            transition: 0.3s;
+        }
+
+            #auth-trigger:hover {
+                color: var(--primary);
+                border-color: var(--primary);
+            }
+
+        /* Dev Dashboard */
+        #admin-panel {
+            display: none;
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #151515;
+            border: 3px solid var(--primary);
+            padding: 15px;
+            z-index: 10000;
+            box-shadow: 8px 8px 0px var(--secondary);
+            width: 250px;
+        }
+
+            #admin-panel label {
+                font-size: 0.6rem;
+                display: block;
+                margin-bottom: 4px;
+                color: #aaa;
+            }
+
+            #admin-panel select, #admin-panel input {
+                width: 100%;
+                background: #000;
+                color: #fff;
+                border: 1px solid #444;
+                padding: 8px;
+                margin-bottom: 12px;
+                font-family: inherit;
+                box-sizing: border-box;
+            }
+
+                #admin-panel select:focus, #admin-panel input:focus {
+                    border-color: var(--primary);
+                    outline: none;
+                }
+
+        .dash-btn {
+            width: 100%;
+            background: var(--primary);
+            color: #000;
+            border: none;
+            padding: 10px;
+            font-weight: bold;
+            cursor: pointer;
+            font-family: inherit;
+            margin-bottom: 5px;
+        }
+
+        /* Quick Status Grid */
+        .status-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 5px;
+            margin-bottom: 12px;
+        }
+
+            .status-grid button {
+                border: none;
+                padding: 6px;
+                font-weight: bold;
+                cursor: pointer;
+                font-family: inherit;
+                font-size: 0.65rem;
+            }
+
+        .btn-up {
+            background: #00ff00;
+            color: #000;
+        }
+
+        .btn-down {
+            background: #ff0000;
+            color: #fff;
+        }
+
         @keyframes devPulse {
             0% {
-                border-color: #a349a4;
-                box-shadow: inset 0 0 10px #a349a4;
+                border-color: var(--secondary);
+                box-shadow: inset 0 0 10px var(--secondary);
             }
 
             50% {
-                border-color: #ffa2fd;
-                box-shadow: inset 0 0 20px #ffa2fd;
+                border-color: var(--primary);
+                box-shadow: inset 0 0 20px var(--primary);
             }
 
             100% {
-                border-color: #a349a4;
-                box-shadow: inset 0 0 10px #a349a4;
+                border-color: var(--secondary);
+                box-shadow: inset 0 0 10px var(--secondary);
             }
         }
 
@@ -44,21 +244,36 @@
         }
 
         .container {
-            border: 4px solid #a349a4;
+            position: relative;
+            border: 4px solid var(--secondary);
             padding: 20px 35px;
             width: 100%;
             max-width: 620px;
             background: #151515;
-            box-shadow: 12px 12px 0px #a349a4;
+            box-shadow: 12px 12px 0px var(--secondary);
             box-sizing: border-box;
             display: flex;
             flex-direction: column;
         }
 
+        #theme-dot {
+            position: absolute;
+            top: 12px;
+            left: 12px;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--primary);
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 0 8px var(--primary);
+            z-index: 10;
+        }
+
         h1 {
             font-size: 2.2rem;
             margin: 0 0 15px 0;
-            color: #ffa2fd;
+            color: var(--primary);
             text-transform: lowercase;
             text-align: center;
             letter-spacing: -1px;
@@ -87,6 +302,11 @@
             border: 3px solid;
             background: #111;
         }
+
+            a:hover {
+                transform: translate(-3px, -3px);
+                filter: brightness(1.2);
+            }
 
         .roblox {
             border-color: #fff #555 #555 #fff;
@@ -126,9 +346,20 @@
             margin-top: 5px;
         }
 
-        a:hover {
-            transform: translate(-3px, -3px);
-            filter: brightness(1.2);
+        .status {
+            font-size: 0.8rem;
+            margin-left: 10px;
+            vertical-align: middle;
+        }
+
+        .status-working {
+            color: #00ff00;
+            text-shadow: 0 0 5px #00ff00;
+        }
+
+        .status-down {
+            color: #ff0000;
+            text-shadow: 0 0 5px #ff0000;
         }
 
         .notice {
@@ -163,13 +394,13 @@
             display: block;
             margin-top: 4px;
             font-style: italic;
-            color: #ffa2fd;
+            color: var(--primary);
         }
 
         .dm-section {
             background: #1e0a2d;
             padding: 8px 12px;
-            border-left: 4px solid #ffa2fd;
+            border-left: 4px solid var(--primary);
             margin-bottom: 10px;
             font-size: 0.8rem;
         }
@@ -184,7 +415,7 @@
 
         #dev-badge {
             display: none;
-            background: #ffa2fd;
+            background: var(--primary);
             color: #0d0d0d;
             font-size: 0.65rem;
             padding: 2px 6px;
@@ -208,8 +439,66 @@
 </head>
 <body>
 
+    <!-- Notification Toast -->
+    <div id="toast">SYSTEM NOTIFICATION</div>
+
+    <!-- Maintenance Overlay -->
+    <div id="maint-screen"><h1>SYSTEM OFFLINE</h1><p>Verner is currently tweaking the code.</p></div>
+
+    <!-- Custom Auth Modal -->
+    <div id="auth-modal">
+        <div class="auth-box">
+            <div style="color:var(--primary); font-weight:bold;">ENTER PASSKEY</div>
+            <input type="password" id="auth-input" placeholder="••••••••">
+            <div class="btn-row">
+                <button onclick="closeAuth()" style="background:#333; color:#fff;">CANCEL</button>
+                <button onclick="submitAuth()" style="background:var(--primary); color:#000;">LOGIN</button>
+            </div>
+        </div>
+    </div>
+
+    <button id="auth-trigger" onclick="adminAuth()">[SYSTEM AUTH]</button>
+
+    <!-- Command Center -->
+    <div id="admin-panel">
+        <div style="font-size:0.6rem; color:var(--primary); margin-bottom:10px;">USERS ACTIVE: <span id="user-count">1</span></div>
+
+        <!-- 1-Tap Quick Actions -->
+        <label>VIP SERVER STATUS</label>
+        <div class="status-grid">
+            <button class="btn-up" onclick="setStatus('vipStatus', '(WORKING)')">UP</button>
+            <button class="btn-down" onclick="setStatus('vipStatus', '(DOWN)')">DOWN</button>
+        </div>
+
+        <label>CURRENT SERVER STATUS</label>
+        <div class="status-grid">
+            <button class="btn-up" onclick="setStatus('currentStatus', '(WORKING)')">UP</button>
+            <button class="btn-down" onclick="setStatus('currentStatus', '(DOWN)')">DOWN</button>
+        </div>
+
+        <!-- Database Push Tool -->
+        <label>TARGET DATA</label>
+        <select id="dev-target">
+            <option value="title">Main Title</option>
+            <option value="vip">Private Server URL</option>
+            <option value="current">Current Server URL</option>
+            <option value="roblox">Roblox URL</option>
+            <option value="youtube">YouTube URL</option>
+            <option value="twitch">Twitch URL</option>
+            <option value="tiktok">TikTok URL</option>
+            <option value="discord">Discord URL</option>
+            <option value="logs">Update Logs Text</option>
+        </select>
+        <input type="text" id="dev-input" placeholder="Value here...">
+        <button class="dash-btn" id="dev-push">PUSH TO DATABASE</button>
+
+        <button class="dash-btn" onclick="toggleMaint()" style="background:#ff0000; color:#fff;">TOGGLE MAINTENANCE</button>
+        <button class="dash-btn" onclick="setDev(false)" style="background:#333; color:#fff;">LOGOUT</button>
+    </div>
+
     <div class="container">
-        <h1>Verner's links <span id="dev-badge">Dev</span></h1>
+        <button id="theme-dot" onclick="cycleTheme()"></button>
+        <h1><span id="live-title">Verner's links</span><span id="dev-badge">Dev</span></h1>
 
         <div class="links">
             <a href="#" id="link-roblox" class="roblox">Roblox</a>
@@ -219,12 +508,12 @@
             <a href="#" id="link-discord" class="discord">Discord</a>
 
             <div class="link-group">
-                <a href="#" id="live-vip" class="server-vip">Private server</a>
+                <a href="#" id="live-vip" class="server-vip">Private server <span id="vip-status" class="status"></span></a>
                 <span class="notice gold-text">may not work; tell us in stream. fixed if pixel is online.</span>
             </div>
 
             <div class="link-group">
-                <a href="#" id="live-current" class="server-current">Current server</a>
+                <a href="#" id="live-current" class="server-current">Current server <span id="cur-status" class="status"></span></a>
                 <span class="notice green-text">if it doesnt work notify us. fixed if pixel is online.</span>
             </div>
 
@@ -233,24 +522,18 @@
 
         <div class="footer">
             <div class="update-log">
-                <strong>logs:</strong> <span id="log-text">fetching latest logs...</span><br>
+                <strong>logs:</strong> <span id="log-text">syncing...</span><br>
                 <strong>updated:</strong> 2026-04-27<br>
                 <span class="one-liner"><strong>made by pxlzfr (nPixelz)</strong> - "i'm the one developing this-" -pixel</span>
             </div>
-
-            <div class="dm-section">
-                <strong>DMS:</strong> vernerz1, pxlzfr (verner & head mod)
-            </div>
-
-            <div class="copyright">
-                © Copyright 2026 The Huge nPixelz™ | All rights reserved ®
-            </div>
+            <div class="dm-section"><strong>DMS:</strong> vernerz1, pxlzfr (verner & head mod)</div>
+            <div class="copyright">© Copyright 2026 The Huge nPixelz™ | All rights reserved ®</div>
         </div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
-        import { getDatabase, ref, onValue, set } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-database.js";
+        import { getDatabase, ref, onValue, set, onDisconnect, increment } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-database.js";
 
         const firebaseConfig = {
         apiKey: "AIzaSyASdvWuvLUUm7-oU4qRBK2vhIVMWCtJkFc",
@@ -264,57 +547,106 @@
 
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
+        const isDev = localStorage.getItem('isDev') === 'true';
 
-        // --- ELEMENTS ---
-        const badge = document.getElementById('dev-badge');
-        const elements = {
-        vip: document.getElementById('live-vip'),
-        current: document.getElementById('live-current'),
-        roblox: document.getElementById('link-roblox'),
-        youtube: document.getElementById('link-youtube'),
-        twitch: document.getElementById('link-twitch'),
-        tiktok: document.getElementById('link-tiktok'),
-        discord: document.getElementById('link-discord'),
-        logs: document.getElementById('log-text')
+        // --- CUSTOM TOAST LOGIC ---
+        window.showToast = (msg) => {
+        const toast = document.getElementById('toast');
+        toast.innerText = msg;
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 3000);
         };
 
-        // --- LISTENERS ---
-        Object.keys(elements).forEach(key => {
-        onValue(ref(db, `vlinks/${key}`), (snapshot) => {
-        const data = snapshot.val();
-        if (data) {
-        if (key === 'logs') elements[key].innerText = data;
-        else elements[key].href = data;
-        }
+        // --- THEME SYNC ---
+        const themes = ["pink", "blue", "red", "green"];
+        let currentTheme = "pink";
+        onValue(ref(db, 'vlinks/theme'), (s) => {
+        currentTheme = s.val() || "pink";
+        document.documentElement.setAttribute('data-theme', currentTheme);
+        });
+        window.cycleTheme = () => { if (isDev) set(ref(db, 'vlinks/theme'), themes[(themes.indexOf(currentTheme) + 1) % themes.length]); };
+
+        // --- STATUS HANDLERS ---
+        const updateStatusText = (id, text) => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.innerText = text;
+        el.className = 'status ' + (text.includes('WORKING') ? 'status-working' : 'status-down');
+        };
+        onValue(ref(db, 'vlinks/vipStatus'), s => updateStatusText('vip-status', s.val() || '(DOWN)'));
+        onValue(ref(db, 'vlinks/currentStatus'), s => updateStatusText('cur-status', s.val() || '(DOWN)'));
+
+        window.setStatus = (target, val) => {
+        set(ref(db, `vlinks/${target}`), val).then(() => showToast(`[${target}] UPDATED`));
+        };
+
+        // --- PRESENCE & MAINT ---
+        const presenceRef = ref(db, 'presence/count');
+        set(presenceRef, increment(1));
+        onDisconnect(presenceRef).set(increment(-1));
+        onValue(presenceRef, s => { document.getElementById('user-count').innerText = s.val(); });
+
+        onValue(ref(db, 'vlinks/maintenance'), s => {
+        document.getElementById('maint-screen').style.display = (s.val() && !isDev) ? 'flex' : 'none';
+        });
+
+        // --- LIVE SYNC ---
+        const uiElements = {
+        title: document.getElementById('live-title'), vip: document.getElementById('live-vip'),
+        current: document.getElementById('live-current'), roblox: document.getElementById('link-roblox'),
+        youtube: document.getElementById('link-youtube'), twitch: document.getElementById('link-twitch'),
+        tiktok: document.getElementById('link-tiktok'), discord: document.getElementById('link-discord'),
+        logs: document.getElementById('log-text')
+        };
+        Object.keys(uiElements).forEach(key => {
+        onValue(ref(db, `vlinks/${key}`), (s) => {
+        if (!s.val()) return;
+        if (key === 'logs' || key === 'title') uiElements[key].innerText = s.val();
+        else uiElements[key].href = s.val();
         });
         });
 
-        // --- DEV CHECK ---
-        if (localStorage.getItem('isDev') === 'true') {
-        if (badge) badge.style.display = 'inline-block';
-        document.body.classList.add('dev-mode-active');
-        console.log("%c Welcome back, Bruno. All systems nominal. ", "color: #ffa2fd; font-weight: bold;");
+        // --- CUSTOM AUTH MODAL ---
+        window.adminAuth = () => {
+        if (isDev) { window.setDev(false); return; }
+        document.getElementById('auth-modal').style.display = 'flex';
+        };
+        window.closeAuth = () => document.getElementById('auth-modal').style.display = 'none';
+        window.submitAuth = () => {
+        if (document.getElementById('auth-input').value === "99C2accessForDevDaddy") {
+        window.setDev(true);
+        } else {
+        showToast("ACCESS DENIED");
+        document.getElementById('auth-input').value = "";
+        closeAuth();
         }
+        };
 
-        // --- COMMANDS ---
         window.setDev = (status) => {
         status ? localStorage.setItem('isDev', 'true') : localStorage.removeItem('isDev');
         location.reload();
         };
 
-        const updateData = (path, val) => {
-        if (localStorage.getItem('isDev') !== 'true') return console.error("Access Denied.");
-        set(ref(db, `vlinks/${path}`), val).then(() => {
-        console.log(`%c [!] ${path.toUpperCase()} UPDATED GLOBALLY `, "color: #ffa2fd; font-weight: bold;");
-        });
+        if (isDev) {
+        document.getElementById('dev-badge').style.display = 'inline-block';
+        document.getElementById('admin-panel').style.display = 'block';
+        document.body.classList.add('dev-mode-active');
+        document.getElementById('auth-trigger').innerText = "[LOGOUT]";
+        showToast("DEV MODE ACTIVE");
+        }
+
+        // --- DASHBOARD ACTIONS ---
+        document.getElementById('dev-push').onclick = () => {
+        const target = document.getElementById('dev-target').value;
+        set(ref(db, `vlinks/${target}`), document.getElementById('dev-input').value)
+        .then(() => showToast(`DATA PUSHED SUCCESFULLY`));
         };
 
-        window.updateVIP = (url) => updateData('vip', url);
-        window.updateCurrent = (url) => updateData('current', url);
-        window.setLog = (msg) => updateData('logs', msg);
-        window.updateSocials = (plat, url) => updateData(plat.toLowerCase(), url);
-
-        console.log("Commands loaded: updateVIP(url), updateCurrent(url), setLog(text), updateSocials(platform, url)");
+        window.toggleMaint = () => {
+        onValue(ref(db, 'vlinks/maintenance'), s => {
+        set(ref(db, 'vlinks/maintenance'), !s.val()).then(() => showToast(`MAINTENANCE: ${!s.val() ? 'ON' : 'OFF'}`));
+        }, {onlyOnce: true});
+        };
     </script>
 </body>
 </html>
