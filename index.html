@@ -4,38 +4,354 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <base target="_blank">
-    <title>verner</title>
+    <title>vLinks</title>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700;900&display=swap" rel="stylesheet">
+
+    <script>
+        const savedTheme = localStorage.getItem('vTheme') || 'pink';
+        document.documentElement.setAttribute('data-theme', savedTheme);
+    </script>
+
     <style>
+        :root {
+            --primary: #ffa2fd;
+            --secondary: #a349a4;
+        }
+
+        [data-theme="blue"] {
+            --primary: #a2d2ff;
+            --secondary: #5865F2;
+        }
+
+        [data-theme="red"] {
+            --primary: #ff4d4d;
+            --secondary: #8b0000;
+        }
+
+        [data-theme="green"] {
+            --primary: #47fd48;
+            --secondary: #008f11;
+        }
+
+        /* Enforce font everywhere */
+        * {
+            font-family: 'JetBrains Mono', monospace !important;
+            box-sizing: border-box;
+        }
+
+        @keyframes devPulse {
+            0% {
+                border-color: var(--secondary);
+                box-shadow: inset 0 0 10px var(--secondary);
+            }
+
+            50% {
+                border-color: var(--primary);
+                box-shadow: inset 0 0 20px var(--primary);
+            }
+
+            100% {
+                border-color: var(--secondary);
+                box-shadow: inset 0 0 10px var(--secondary);
+            }
+        }
+
         body {
             background: #0d0d0d;
             color: #eeeeee;
-            font-family: 'JetBrains Mono', monospace;
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
             margin: 0;
             padding: 10px;
-            box-sizing: border-box;
-            overflow: hidden; /* Hard fit for 100% size */
+            overflow: hidden;
+            transition: border 0.3s ease;
+            border: 4px solid transparent;
+            animation: devPulse 4s infinite ease-in-out;
+            position: relative;
+        }
+
+        /* Floating Dev Text System */
+        #dev-particles {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            overflow: hidden;
+            z-index: 0;
+        }
+
+        .dev-floater {
+            position: absolute;
+            color: var(--primary);
+            opacity: 0.15;
+            font-weight: 900;
+            font-size: 1.2rem;
+            animation: drift linear infinite alternate;
+        }
+
+        @keyframes drift {
+            0% {
+                transform: translateY(0px) translateX(0px) rotate(-10deg);
+            }
+
+            100% {
+                transform: translateY(-80px) translateX(50px) rotate(15deg);
+            }
+        }
+
+        /* Welcome Blur/Fade Animation */
+        #welcome-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: #0d0d0d;
+            z-index: 50000;
+            justify-content: center;
+            align-items: center;
+            color: var(--primary);
+            font-size: 3rem;
+            font-weight: bold;
+            text-transform: lowercase;
+            letter-spacing: 2px;
+        }
+
+        .blur-fade-anim {
+            animation: blurFade 2.5s ease-in-out forwards;
+        }
+
+        @keyframes blurFade {
+            0% {
+                opacity: 0;
+                filter: blur(25px);
+                transform: scale(0.8);
+            }
+
+            30% {
+                opacity: 1;
+                filter: blur(0px);
+                transform: scale(1.05);
+            }
+
+            70% {
+                opacity: 1;
+                filter: blur(0px);
+                transform: scale(1);
+            }
+
+            100% {
+                opacity: 0;
+                filter: blur(20px);
+                transform: scale(1.3);
+            }
+        }
+
+        /* Screens & Modals */
+        #maint-screen {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: #000;
+            z-index: 20000;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: var(--primary);
+        }
+
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.85);
+            z-index: 30000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-box {
+            background: #151515;
+            border: 3px solid var(--primary);
+            padding: 25px;
+            box-shadow: 8px 8px 0px var(--secondary);
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            text-align: center;
+            width: 300px;
+            max-width: 90vw;
+        }
+
+            .modal-box input, .modal-box textarea {
+                background: #000;
+                color: #fff;
+                border: 1px solid #444;
+                padding: 10px;
+                text-align: center;
+                resize: none;
+            }
+
+                .modal-box input:focus, .modal-box textarea:focus {
+                    border-color: var(--primary);
+                    outline: none;
+                }
+
+        .btn-row {
+            display: flex;
+            gap: 10px;
+        }
+
+        .modal-box button {
+            flex: 1;
+            border: none;
+            padding: 10px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        /* Custom Toast Notification */
+        #toast {
+            position: fixed;
+            top: 20px;
+            right: -300px;
+            background: var(--primary);
+            color: #000;
+            padding: 12px 20px;
+            font-weight: bold;
+            z-index: 40000;
+            font-size: 0.8rem;
+            border: 2px solid #fff;
+            box-shadow: 5px 5px 0px var(--secondary);
+            transition: right 0.3s ease-in-out;
+        }
+
+            #toast.show {
+                right: 20px;
+            }
+
+        /* Trigger Button */
+        #auth-trigger {
+            position: fixed;
+            top: 15px;
+            left: 15px;
+            background: #111;
+            border: 1px solid #333;
+            color: #444;
+            padding: 5px 10px;
+            font-size: 0.6rem;
+            cursor: pointer;
+            z-index: 10001;
+            transition: 0.3s;
+        }
+
+            #auth-trigger:hover {
+                color: var(--primary);
+                border-color: var(--primary);
+            }
+
+        /* Dev Dashboard */
+        #admin-panel {
+            display: none;
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #151515;
+            border: 3px solid var(--primary);
+            padding: 15px;
+            z-index: 10000;
+            box-shadow: 8px 8px 0px var(--secondary);
+            width: 250px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+            #admin-panel label {
+                font-size: 0.6rem;
+                display: block;
+                margin-bottom: 4px;
+                color: #aaa;
+                margin-top: 8px;
+            }
+
+            #admin-panel select, #admin-panel input {
+                width: 100%;
+                background: #000;
+                color: #fff;
+                border: 1px solid #444;
+                padding: 8px;
+                margin-bottom: 12px;
+            }
+
+                #admin-panel select:focus, #admin-panel input:focus {
+                    border-color: var(--primary);
+                    outline: none;
+                }
+
+        .dash-btn {
+            width: 100%;
+            background: var(--primary);
+            color: #000;
+            border: none;
+            padding: 10px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-bottom: 5px;
+        }
+
+        .status-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 5px;
+        }
+
+            .status-grid button {
+                border: none;
+                padding: 6px;
+                font-weight: bold;
+                cursor: pointer;
+                font-size: 0.65rem;
+            }
+
+        .btn-up {
+            background: #00ff00;
+            color: #000;
+        }
+
+        .btn-down {
+            background: #ff0000;
+            color: #fff;
         }
 
         .container {
-            border: 4px solid #a349a4;
+            position: relative;
+            border: 4px solid var(--secondary);
             padding: 20px 35px;
             width: 100%;
-            max-width: 620px; /* Slightly wider to fit the one-liner */
+            max-width: 620px;
             background: #151515;
-            box-shadow: 12px 12px 0px #a349a4;
-            box-sizing: border-box;
+            box-shadow: 12px 12px 0px var(--secondary);
             display: flex;
             flex-direction: column;
+            z-index: 10;
+        }
+
+        #theme-dot {
+            position: absolute;
+            top: 12px;
+            left: 12px;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--primary);
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 0 8px var(--primary);
         }
 
         h1 {
             font-size: 2.2rem;
             margin: 0 0 15px 0;
-            color: #ffa2fd;
+            color: var(--primary);
             text-transform: lowercase;
             text-align: center;
             letter-spacing: -1px;
@@ -65,7 +381,11 @@
             background: #111;
         }
 
-        /* --- Colors --- */
+            a:hover {
+                transform: translate(-3px, -3px);
+                filter: brightness(1.2);
+            }
+
         .roblox {
             border-color: #fff #555 #555 #fff;
         }
@@ -98,15 +418,32 @@
         }
 
         .src-link {
-            border-color: #f3b4ff;
+            border-color: var(--primary);
             font-size: 0.8rem;
             opacity: 0.6;
             margin-top: 5px;
+            background: transparent;
+            color: #fff;
+            cursor: pointer;
+            padding: 8px;
+            border-style: dashed;
+            flex: 1;
         }
 
-        a:hover {
-            transform: translate(-3px, -3px);
-            filter: brightness(1.2);
+        .status {
+            font-size: 0.8rem;
+            margin-left: 10px;
+            vertical-align: middle;
+        }
+
+        .status-working {
+            color: #00ff00;
+            text-shadow: 0 0 5px #00ff00;
+        }
+
+        .status-down {
+            color: #ff0000;
+            text-shadow: 0 0 5px #ff0000;
         }
 
         .notice {
@@ -137,20 +474,28 @@
             line-height: 1.5;
         }
 
+        .btn-row-small {
+            display: flex;
+            gap: 10px;
+            margin-top: 8px;
+            margin-bottom: 8px;
+        }
+
         .one-liner {
-            white-space: nowrap; /* Forces the flex on one line */
             display: block;
             margin-top: 4px;
             font-style: italic;
-            color: #ffa2fd;
+            color: var(--primary);
         }
 
         .dm-section {
             background: #1e0a2d;
             padding: 8px 12px;
-            border-left: 4px solid #ffa2fd;
+            border-left: 4px solid var(--primary);
             margin-bottom: 10px;
             font-size: 0.8rem;
+            display: flex;
+            justify-content: space-between;
         }
 
         .copyright {
@@ -161,6 +506,33 @@
             padding-top: 8px;
         }
 
+        #dev-badge {
+            display: none;
+            background: var(--primary);
+            color: #0d0d0d;
+            font-size: 0.65rem;
+            padding: 2px 6px;
+            border-radius: 3px;
+            margin-left: 8px;
+            vertical-align: middle;
+            font-weight: 900;
+            text-transform: uppercase;
+        }
+
+        /* Changelog List specific styles */
+        .log-entry {
+            border-bottom: 1px solid #333;
+            padding: 8px 0;
+            text-align: left;
+        }
+
+        .log-date {
+            color: var(--primary);
+            font-size: 0.65rem;
+            display: block;
+            margin-bottom: 2px;
+        }
+
         @media (max-width: 600px) {
             .container {
                 padding: 15px;
@@ -169,55 +541,395 @@
             h1 {
                 font-size: 1.8rem;
             }
-
-            .one-liner {
-                white-space: normal;
-            }
-            /* Allow wrap only on tiny phones */
         }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <h1>verner's links</h1>
+    <div id="dev-particles"></div>
 
-        <div class="links">
-            <a href="https://www.roblox.com/users/5252491078/profile" class="roblox">roblox</a>
-            <a href="https://youtube.com/@Verner_W" class="youtube">youtube</a>
-            <a href="https://twitch.tv/Verner_Ww" class="twitch">twitch</a>
-            <a href="https://tiktok.com/@Verner_W" class="tiktok">tiktok</a>
-            <a href="https://discord.gg/ccGFawHpjQ" class="discord">discord</a>
+    <div id="welcome-overlay">welcome dev.</div>
+    <div id="toast">SYSTEM NOTIFICATION</div>
+    <div id="maint-screen"><h1>SYSTEM OFFLINE</h1><p>Verner is currently tweaking the code.</p></div>
 
-            <div class="link-group">
-                <a href="https://is.gd/votserv2/" class="server-vip">private server</a>
-                <span class="notice gold-text">may not work; tell us in stream. fixed if pixel is online.</span>
-            </div>
-
-            <div class="link-group">
-                <a href="#" class="server-current">current server</a>
-                <span class="notice green-text">if it doesnt work notify us. fixed if pixel is online.</span>
-            </div>
-
-            <a href="https://github.com/pixxella/VernersIoPage" class="src-link">website source code</a>
-        </div>
-
-        <div class="footer">
-            <div class="update-log">
-                <strong>logs:</strong> added youtube, fixed size<br>
-                <strong>updated:</strong> 2026-04-27<br>
-                <span class="one-liner"><strong>made by pxlzfr (nPixelz)</strong> - "i'm the one developing this-" -pixel</span>
-            </div>
-
-            <div class="dm-section">
-                <strong>DMS:</strong> vernerz1, pxlzfr (verner & head mod)
-            </div>
-
-            <div class="copyright">
-                © Copyright 2026 The Huge nPixelz™ | All rights reserved ®
+    <div id="auth-modal" class="modal-overlay">
+        <div class="modal-box">
+            <div style="color:var(--primary); font-weight:bold;">ENTER PASSKEY</div>
+            <input type="password" id="auth-input" placeholder="••••••••">
+            <div class="btn-row">
+                <button onclick="closeModal('auth-modal')" style="background:#333; color:#fff;">CANCEL</button>
+                <button onclick="submitAuth()" style="background:var(--primary); color:#000;">LOGIN</button>
             </div>
         </div>
     </div>
 
+    <div id="sugg-modal" class="modal-overlay">
+        <div class="modal-box">
+            <div style="color:var(--primary); font-weight:bold;">DROP A SUGGESTION</div>
+            <textarea id="sugg-input" rows="4" placeholder="what should we add..."></textarea>
+            <div class="btn-row">
+                <button onclick="closeModal('sugg-modal')" style="background:#333; color:#fff;">CANCEL</button>
+                <button onclick="submitSuggestion()" style="background:var(--primary); color:#000;">SEND IT</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="change-modal" class="modal-overlay">
+        <div class="modal-box" style="width: 400px; max-height: 60vh; overflow-y: auto;">
+            <div style="color:var(--primary); font-weight:bold; margin-bottom: 10px;">CHANGELOG</div>
+            <div id="changelog-list" style="font-size: 0.8rem;">
+            </div>
+            <button onclick="closeModal('change-modal')" style="background:#333; color:#fff; margin-top: 10px;">CLOSE</button>
+        </div>
+    </div>
+
+    <div id="admin-sugg-viewer" class="modal-overlay">
+        <div class="modal-box" style="width: 400px; max-height: 60vh; overflow-y: auto;">
+            <div style="color:var(--primary); font-weight:bold; margin-bottom: 10px;">USER SUGGESTIONS</div>
+            <div id="admin-sugg-list" style="font-size: 0.8rem;">
+            </div>
+            <button onclick="closeModal('admin-sugg-viewer')" style="background:#333; color:#fff; margin-top: 10px;">CLOSE</button>
+        </div>
+    </div>
+
+    <button id="auth-trigger" onclick="adminAuth()">[SYSTEM AUTH]</button>
+
+    <div id="admin-panel">
+        <div style="font-size:0.6rem; color:var(--primary); margin-bottom:5px;">USERS ACTIVE: <span id="user-count">1</span></div>
+
+        <button class="dash-btn" onclick="openModal('admin-sugg-viewer')" style="background:var(--secondary); color:#fff; font-size: 0.75rem;">VIEW USER SUGGESTIONS</button>
+
+        <label>VIP SERVER STATUS</label>
+        <div class="status-grid">
+            <button class="btn-up" onclick="setStatus('vipStatus', '(WORKING)')">UP</button>
+            <button class="btn-down" onclick="setStatus('vipStatus', '(DOWN)')">DOWN</button>
+        </div>
+
+        <label>CURRENT SERVER STATUS</label>
+        <div class="status-grid">
+            <button class="btn-up" onclick="setStatus('currentStatus', '(WORKING)')">UP</button>
+            <button class="btn-down" onclick="setStatus('currentStatus', '(DOWN)')">DOWN</button>
+        </div>
+
+        <div style="margin-top:15px; border-top: 1px dashed #444; padding-top:10px;">
+            <label style="color:#fff;">PUSH CHANGELOG UPDATE</label>
+            <input type="text" id="dev-change-input" placeholder="Fixed a bug...">
+            <button class="dash-btn" onclick="pushChangelog()" style="background:#fff; color:#000;">ADD CHANGELOG</button>
+        </div>
+
+        <div style="margin-top:10px; border-top: 1px dashed #444; padding-top:10px;">
+            <label>TARGET DATA (LINKS)</label>
+            <select id="dev-target">
+                <option value="title">Main Title</option>
+                <option value="vip">Private Server URL</option>
+                <option value="current">Current Server URL</option>
+                <option value="roblox">Roblox URL</option>
+                <option value="youtube">YouTube URL</option>
+                <option value="twitch">Twitch URL</option>
+                <option value="tiktok">TikTok URL</option>
+                <option value="discord">Discord URL</option>
+            </select>
+            <input type="text" id="dev-input" placeholder="Value here...">
+            <button class="dash-btn" id="dev-push">PUSH TO DATABASE</button>
+        </div>
+
+        <div style="margin-top:10px;">
+            <button class="dash-btn" onclick="toggleMaint()" style="background:#ff0000; color:#fff;">TOGGLE MAINTENANCE</button>
+            <button class="dash-btn" onclick="setDev(false)" style="background:#333; color:#fff;">LOGOUT</button>
+        </div>
+    </div>
+
+    <div class="container">
+        <button id="theme-dot" onclick="cycleTheme()"></button>
+        <h1><span id="live-title">Verner's links</span><span id="dev-badge">Dev</span></h1>
+
+        <div class="links">
+            <a href="#" id="link-roblox" class="roblox">Roblox</a>
+            <a href="#" id="link-youtube" class="youtube">YouTube</a>
+            <a href="#" id="link-twitch" class="twitch">Twitch</a>
+            <a href="#" id="link-tiktok" class="tiktok">TikTok</a>
+            <a href="#" id="link-discord" class="discord">Discord</a>
+
+            <div class="link-group">
+                <a href="#" id="live-vip" class="server-vip">Private server <span id="vip-status" class="status"></span></a>
+                <span class="notice gold-text">may not work; tell us in stream. fixed if pixel is online.</span>
+            </div>
+
+            <div class="link-group">
+                <a href="#" id="live-current" class="server-current">Current server <span id="cur-status" class="status"></span></a>
+                <span class="notice green-text">if it doesnt work notify us. fixed if pixel is online.</span>
+            </div>
+        </div>
+
+        <div class="footer">
+            <div class="update-log">
+                <strong>latest update:</strong> <span id="latest-update-text" style="color: var(--primary);">fetching...</span><br>
+
+                <div class="btn-row-small">
+                    <button class="src-link" onclick="openModal('change-modal')">[CHANGELOG]</button>
+                    <button class="src-link" onclick="openModal('sugg-modal')">[SUGGESTIONS]</button>
+                </div>
+
+                <span class="one-liner"><strong>made by pxlzfr (nPixelz)</strong> - "i'm the one developing this-" -pixel</span>
+            </div>
+            <div class="dm-section">
+                <span><strong>DMS:</strong> vernerz1, pxlzfr</span>
+                <span style="color:var(--primary); font-weight:bold;">VISITS: <span id="total-visits">0</span></span>
+            </div>
+            <div class="copyright">© Copyright 2026 The Huge nPixelz™ | All rights reserved ®</div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
+        import { getDatabase, ref, onValue, set, onDisconnect, increment, push } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-database.js";
+
+        const firebaseConfig = {
+        apiKey: "AIzaSyASdvWuvLUUm7-oU4qRBK2vhIVMWCtJkFc",
+        authDomain: "vlinks-backend.firebaseapp.com",
+        projectId: "vlinks-backend",
+        storageBucket: "vlinks-backend.firebasestorage.app",
+        messagingSenderId: "1054304746220",
+        appId: "1:1054304746220:web:758c6a365191abe4ce03c9",
+        databaseURL: "https://vlinks-backend-default-rtdb.europe-west1.firebasedatabase.app"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+        const isDev = localStorage.getItem('isDev') === 'true';
+
+        // --- GLOBAL UI HELPERS ---
+        window.showToast = (msg) => {
+        const toast = document.getElementById('toast');
+        toast.innerText = msg;
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 3000);
+        };
+
+        window.openModal = (id) => document.getElementById(id).style.display = 'flex';
+        window.closeModal = (id) => document.getElementById(id).style.display = 'none';
+
+        // --- DEV PARTICLE SYSTEM (MORE + FASTER) ---
+        if (isDev) {
+        const particleContainer = document.getElementById('dev-particles');
+        for (let i = 0; i < 25; i++) {
+        let span = document.createElement('span');
+        span.innerText = '[DEV]';
+        span.className = 'dev-floater';
+        span.style.top = Math.random() * 100 + 'vh';
+        span.style.left = Math.random() * 100 + 'vw';
+        span.style.animationDuration = (3 + Math.random() * 4) + 's';
+        span.style.animationDelay = (Math.random() * 3) + 's';
+        particleContainer.appendChild(span);
+        }
+        }
+
+        // --- THEME SYNC WITH CACHING TO STOP FLICKER ---
+        const themes = ["pink", "blue", "red", "green"];
+        let currentTheme = localStorage.getItem('vTheme') || "pink";
+
+        onValue(ref(db, 'vlinks/theme'), (s) => {
+        currentTheme = s.val() || "pink";
+        document.documentElement.setAttribute('data-theme', currentTheme);
+        localStorage.setItem('vTheme', currentTheme);
+        });
+        window.cycleTheme = () => { if (isDev) set(ref(db, 'vlinks/theme'), themes[(themes.indexOf(currentTheme) + 1) % themes.length]); };
+
+        // --- STATUS HANDLERS ---
+        const updateStatusText = (id, text) => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.innerText = text;
+        el.className = 'status ' + (text.includes('WORKING') ? 'status-working' : 'status-down');
+        };
+        onValue(ref(db, 'vlinks/vipStatus'), s => updateStatusText('vip-status', s.val() || '(DOWN)'));
+        onValue(ref(db, 'vlinks/currentStatus'), s => updateStatusText('cur-status', s.val() || '(DOWN)'));
+
+        window.setStatus = async (target, val) => {
+        try {
+        await set(ref(db, `vlinks/${target}`), val);
+        showToast(`[${target}] UPDATED`);
+        } catch (error) {
+        alert(`DB ERROR: ${error.message}`);
+        }
+        };
+
+        // --- PRESENCE & VISITS ---
+        const presenceRef = ref(db, 'presence/count');
+        set(presenceRef, increment(1));
+        onDisconnect(presenceRef).set(increment(-1));
+        onValue(presenceRef, s => { document.getElementById('user-count').innerText = s.val(); });
+
+        const visitsRef = ref(db, 'stats/totalVisits');
+        if (!sessionStorage.getItem('hasVisited')) {
+        set(visitsRef, increment(1));
+        sessionStorage.setItem('hasVisited', 'true');
+        }
+        onValue(visitsRef, s => {
+        document.getElementById('total-visits').innerText = s.val() || 0;
+        });
+
+        onValue(ref(db, 'vlinks/maintenance'), s => {
+        document.getElementById('maint-screen').style.display = (s.val() && !isDev) ? 'flex' : 'none';
+        });
+
+        // --- LIVE SYNC LINKS ---
+        const uiElements = {
+        title: document.getElementById('live-title'), vip: document.getElementById('live-vip'),
+        current: document.getElementById('live-current'), roblox: document.getElementById('link-roblox'),
+        youtube: document.getElementById('link-youtube'), twitch: document.getElementById('link-twitch'),
+        tiktok: document.getElementById('link-tiktok'), discord: document.getElementById('link-discord')
+        };
+        Object.keys(uiElements).forEach(key => {
+        onValue(ref(db, `vlinks/${key}`), (s) => {
+        if (!s.val()) return;
+        if (key === 'title') uiElements[key].innerText = s.val();
+        else uiElements[key].href = s.val();
+        });
+        });
+
+        // --- SUGGESTIONS LOGIC ---
+        window.submitSuggestion = async () => {
+        const input = document.getElementById('sugg-input');
+        if (!input.value.trim()) return showToast("CANNOT SEND EMPTY SUGGESTION");
+
+        try {
+        await push(ref(db, 'vlinks/suggestions'), { text: input.value, time: Date.now() });
+        showToast("SUGGESTION SENT TO DB");
+        input.value = "";
+        closeModal('sugg-modal');
+        } catch (error) {
+        alert(`DB ERROR: ${error.message}`);
+        }
+        };
+
+        // Admin Suggestions Viewer
+        if (isDev) {
+        onValue(ref(db, 'vlinks/suggestions'), (s) => {
+        const list = document.getElementById('admin-sugg-list');
+        list.innerHTML = "";
+        const suggs = s.val();
+        if (!suggs) {
+        list.innerHTML = "<div style='opacity:0.5;'>no suggestions yet...</div>";
+        return;
+        }
+        Object.values(suggs).reverse().forEach(sg => {
+        const dateString = new Date(sg.time).toLocaleDateString();
+        list.innerHTML += `
+        <div class="log-entry">
+        <span class="log-date" style="color:#00ff00;">[${dateString}]</span>
+        ${sg.text}
+        </div>
+        `;
+        });
+        });
+        }
+
+        // --- CHANGELOG LOGIC ---
+        onValue(ref(db, 'vlinks/changelogs'), (s) => {
+        const list = document.getElementById('changelog-list');
+        const latestTextSpan = document.getElementById('latest-update-text');
+        list.innerHTML = "";
+        const logs = s.val();
+
+        if (!logs) {
+        list.innerHTML = "<div style='opacity:0.5;'>no logs documented yet...</div>";
+        if(latestTextSpan) latestTextSpan.innerText = "no updates yet...";
+        return;
+        }
+
+        const logArray = Object.values(logs);
+
+        if(latestTextSpan && logArray.length > 0) {
+        latestTextSpan.innerText = logArray[logArray.length - 1].text;
+        }
+
+        logArray.reverse().forEach(log => {
+        const dateString = new Date(log.time).toLocaleDateString();
+        list.innerHTML += `
+        <div class="log-entry">
+        <span class="log-date">[${dateString}]</span>
+        ${log.text}
+        </div>
+        `;
+        });
+        });
+
+        window.pushChangelog = async () => {
+        const val = document.getElementById('dev-change-input').value;
+        if (!val.trim()) return showToast("ENTER A VALUE FIRST");
+
+        try {
+        await push(ref(db, 'vlinks/changelogs'), { text: val, time: Date.now() });
+        showToast("CHANGELOG UPDATED");
+        document.getElementById('dev-change-input').value = "";
+        } catch (error) {
+        alert(`DB ERROR: ${error.message}`);
+        }
+        };
+
+        // --- CUSTOM AUTH MODAL ---
+        window.adminAuth = () => {
+        if (isDev) { window.setDev(false); return; }
+        openModal('auth-modal');
+        };
+
+        window.submitAuth = () => {
+        if (document.getElementById('auth-input').value === "dev123") {
+        closeModal('auth-modal');
+        const overlay = document.getElementById('welcome-overlay');
+        overlay.style.display = 'flex';
+        overlay.classList.add('blur-fade-anim');
+
+        setTimeout(() => { window.setDev(true); }, 2500);
+        } else {
+        showToast("ACCESS DENIED");
+        document.getElementById('auth-input').value = "";
+        closeModal('auth-modal');
+        }
+        };
+
+        window.setDev = (status) => {
+        status ? localStorage.setItem('isDev', 'true') : localStorage.removeItem('isDev');
+        location.reload();
+        };
+
+        if (isDev) {
+        document.getElementById('dev-badge').style.display = 'inline-block';
+        document.getElementById('admin-panel').style.display = 'block';
+        document.body.classList.add('dev-mode-active');
+        document.getElementById('auth-trigger').innerText = "[LOGOUT]";
+        showToast("DEV MODE ACTIVE");
+        }
+
+        // --- DASHBOARD ACTIONS (REBUILT WITH ASYNC/AWAIT) ---
+        document.getElementById('dev-push').onclick = async () => {
+        const target = document.getElementById('dev-target').value;
+        const val = document.getElementById('dev-input').value;
+
+        if (!val.trim()) return showToast("ENTER A VALUE FIRST");
+
+        try {
+        // Browser must wait for this to finish before showing toast
+        await set(ref(db, `vlinks/${target}`), val);
+        showToast(`DATA PUSHED SUCCESFULLY`);
+        document.getElementById('dev-input').value = "";
+        } catch (error) {
+        // If Firebase rejects it, they get an alert
+        alert(`DB ERROR: ${error.message}`);
+        }
+        };
+
+        window.toggleMaint = () => {
+        onValue(ref(db, 'vlinks/maintenance'), async s => {
+        try {
+        await set(ref(db, 'vlinks/maintenance'), !s.val());
+        showToast(`MAINTENANCE: ${!s.val() ? 'ON' : 'OFF'}`);
+        } catch (error) {
+        alert(`DB ERROR: ${error.message}`);
+        }
+        }, {onlyOnce: true});
+        };
+    </script>
 </body>
 </html>
