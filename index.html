@@ -65,7 +65,8 @@
             min-height: 100vh;
             margin: 0;
             padding: 10px;
-            overflow: hidden;
+            overflow-x: hidden;
+            overflow-y: auto;
             transition: border 0.3s ease;
             border: 4px solid transparent;
             animation: devPulse 4s infinite ease-in-out;
@@ -536,10 +537,98 @@
         @media (max-width: 600px) {
             .container {
                 padding: 15px;
+                max-width: 95vw;
+                border-width: 2px;
+                box-shadow: 6px 6px 0px var(--secondary);
             }
 
             h1 {
                 font-size: 1.8rem;
+            }
+
+            a {
+                padding: 10px;
+                font-size: 0.95rem;
+            }
+
+            /* Hide auth trigger on mobile, show mobile buttons */
+            #auth-trigger {
+                display: none;
+            }
+
+            /* Hide admin panel by default on mobile */
+            #admin-panel {
+                display: none !important;
+                position: fixed;
+                bottom: auto;
+                right: auto;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                width: 90vw;
+                max-width: 400px;
+                z-index: 10001;
+                max-height: 80vh;
+            }
+
+            #admin-panel.mobile-open {
+                display: block !important;
+            }
+
+            /* Mobile toggle button */
+            #mobile-panel-toggle {
+                display: flex;
+            }
+
+            #mobile-panel-close {
+                display: none;
+            }
+
+            #mobile-panel-close.show {
+                display: flex;
+            }
+
+            /* Mobile auth button inside container */
+            .mobile-auth-btn {
+                display: flex;
+            }
+
+            /* PC auth button stays hidden on mobile */
+            @media (max-width: 600px) {
+                .mobile-auth-btn {
+                    display: block;
+                    position: absolute;
+                    top: 12px;
+                    right: 12px;
+                    background: #111;
+                    border: 1px solid #333;
+                    color: #444;
+                    padding: 5px 10px;
+                    font-size: 0.6rem;
+                    cursor: pointer;
+                    z-index: 100;
+                    transition: 0.3s;
+                }
+
+                .mobile-auth-btn:hover {
+                    color: var(--primary);
+                    border-color: var(--primary);
+                }
+            }
+        }
+
+        /* PC-only styles */
+        @media (min-width: 601px) {
+            #mobile-panel-toggle {
+                display: none;
+            }
+
+            #mobile-panel-close {
+                display: none;
+            }
+
+            .mobile-auth-btn {
+                display: none;
             }
         }
     </style>
@@ -592,10 +681,24 @@
         </div>
     </div>
 
+    <div id="audio-modal" class="modal-overlay">
+        <div class="modal-box" style="width: 500px; height: 450px;">
+            <div style="color:var(--primary); font-weight:bold;">audio visualizer</div>
+            <canvas id="visualizer" width="400" height="100" style="background:#000;"></canvas>
+            <div id="ity-grid" style="display:grid; grid-template-columns: repeat(4, 1fr); gap: 5px; font-size: 0.5rem; overflow-y: auto; max-height: 200px;"></div>
+            <button onclick="closeModal('audio-modal'); audio.pause();" style="background:#333; color:#fff;">stop</button>
+        </div>
+    </div>
+
     <button id="auth-trigger" onclick="adminAuth()">[SYSTEM AUTH]</button>
 
+    <button id="mobile-panel-toggle" class="dash-btn" onclick="toggleMobilePanel()" style="position: fixed; top: 15px; right: 15px; z-index: 10001; width: auto; padding: 8px 12px; font-size: 0.7rem; background: var(--primary); color: #000; display: none;">[PANEL]</button>
+
     <div id="admin-panel">
-        <div style="font-size:0.6rem; color:var(--primary); margin-bottom:5px;">USERS ACTIVE: <span id="user-count">1</span></div>
+        <div style="font-size:0.6rem; color:var(--primary); margin-bottom:5px; display: flex; justify-content: space-between; align-items: center;">
+            <span>USERS ACTIVE: <span id="user-count">1</span></span>
+            <button id="mobile-panel-close" class="show" onclick="toggleMobilePanel()" style="background: #333; color: #fff; border: none; padding: 3px 8px; font-size: 0.6rem; cursor: pointer; display: none;">X</button>
+        </div>
 
         <button class="dash-btn" onclick="openModal('admin-sugg-viewer')" style="background:var(--secondary); color:#fff; font-size: 0.75rem;">VIEW USER SUGGESTIONS</button>
 
@@ -634,6 +737,10 @@
         </div>
 
         <div style="margin-top:10px;">
+            <label style="color:#fff;">MAINTENANCE STATUS</label>
+            <div style="background: #000; border: 1px solid #444; padding: 8px; margin-bottom: 10px; text-align: center; color: var(--primary); font-weight: bold;">
+                <span id="maint-status-display">CHECKING...</span>
+            </div>
             <button class="dash-btn" onclick="toggleMaint()" style="background:#ff0000; color:#fff;">TOGGLE MAINTENANCE</button>
             <button class="dash-btn" onclick="setDev(false)" style="background:#333; color:#fff;">LOGOUT</button>
         </div>
@@ -641,6 +748,7 @@
 
     <div class="container">
         <button id="theme-dot" onclick="cycleTheme()"></button>
+        <button class="mobile-auth-btn" onclick="adminAuth()" style="display: none;">[AUTH]</button>
         <h1><span id="live-title">Verner's links</span><span id="dev-badge">Dev</span></h1>
 
         <div class="links">
@@ -649,6 +757,7 @@
             <a href="#" id="link-twitch" class="twitch">Twitch</a>
             <a href="#" id="link-tiktok" class="tiktok">TikTok</a>
             <a href="#" id="link-discord" class="discord">Discord</a>
+
 
             <div class="link-group">
                 <a href="#" id="live-vip" class="server-vip">Private server <span id="vip-status" class="status"></span></a>
@@ -698,6 +807,7 @@
         const db = getDatabase(app);
         const isDev = localStorage.getItem('isDev') === 'true';
 
+
         // --- GLOBAL UI HELPERS ---
         window.showToast = (msg) => {
         const toast = document.getElementById('toast');
@@ -708,6 +818,14 @@
 
         window.openModal = (id) => document.getElementById(id).style.display = 'flex';
         window.closeModal = (id) => document.getElementById(id).style.display = 'none';
+
+        // Mobile panel toggle
+        window.toggleMobilePanel = () => {
+        const panel = document.getElementById('admin-panel');
+        const closeBtn = document.getElementById('mobile-panel-close');
+        panel.classList.toggle('mobile-open');
+        closeBtn.classList.toggle('show');
+        };
 
         // --- DEV PARTICLE SYSTEM (MORE + FASTER) ---
         if (isDev) {
@@ -770,7 +888,15 @@
         });
 
         onValue(ref(db, 'vlinks/maintenance'), s => {
-        document.getElementById('maint-screen').style.display = (s.val() && !isDev) ? 'flex' : 'none';
+        const isMaintenance = s.val();
+        document.getElementById('maint-screen').style.display = (isMaintenance && !isDev) ? 'flex' : 'none';
+        
+        // Update admin panel status display
+        const statusDisplay = document.getElementById('maint-status-display');
+        if (statusDisplay) {
+            statusDisplay.innerText = isMaintenance ? 'ON' : 'OFF';
+            statusDisplay.style.color = isMaintenance ? '#ff0000' : '#00ff00';
+        }
         });
 
         // --- LIVE SYNC LINKS ---
@@ -896,7 +1022,10 @@
 
         if (isDev) {
         document.getElementById('dev-badge').style.display = 'inline-block';
+        const isMobile = window.innerWidth <= 600;
+        if (!isMobile) {
         document.getElementById('admin-panel').style.display = 'block';
+        }
         document.body.classList.add('dev-mode-active');
         document.getElementById('auth-trigger').innerText = "[LOGOUT]";
         showToast("DEV MODE ACTIVE");
@@ -920,11 +1049,12 @@
         }
         };
 
-        window.toggleMaint = () => {
+        window.toggleMaint = async () => {
         onValue(ref(db, 'vlinks/maintenance'), async s => {
         try {
-        await set(ref(db, 'vlinks/maintenance'), !s.val());
-        showToast(`MAINTENANCE: ${!s.val() ? 'ON' : 'OFF'}`);
+        const newState = !s.val();
+        await set(ref(db, 'vlinks/maintenance'), newState);
+        showToast(`MAINTENANCE: ${newState ? 'ON' : 'OFF'}`);
         } catch (error) {
         alert(`DB ERROR: ${error.message}`);
         }
