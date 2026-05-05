@@ -47,7 +47,6 @@ All data syncs instantly across devices:
 ## 🎮 Admin Features (Developer Mode)
 
 ### 🔐 Authentication
-- **Password Protected**: Access with `dev123`
 - **Easy Activation**: Click `[SYSTEM AUTH]` button (top-left on PC, top-right on mobile)
 - **Dev Badge**: Shows status with glowing animation
 
