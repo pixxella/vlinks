@@ -57,7 +57,7 @@
         }
 
         body {
-            background: #0d0d0d;
+            background: linear-gradient(135deg, #0d0d0d 0%, #1a0d2e 50%, #0d0d0d 100%);
             color: #eeeeee;
             display: flex;
             justify-content: center;
@@ -71,6 +71,7 @@
             border: 4px solid transparent;
             animation: devPulse 4s infinite ease-in-out;
             position: relative;
+            background-attachment: fixed;
         }
 
         /* Floating Dev Text System */
@@ -171,16 +172,30 @@
         }
 
         .modal-box {
-            background: #151515;
-            border: 3px solid var(--primary);
+            background: linear-gradient(135deg, #151515 0%, #1a1a2e 100%);
+            border: 2px solid var(--primary);
             padding: 25px;
-            box-shadow: 8px 8px 0px var(--secondary);
+            box-shadow: 0 25px 80px rgba(0, 0, 0, 0.7);
             display: flex;
             flex-direction: column;
             gap: 15px;
             text-align: center;
             width: 300px;
             max-width: 90vw;
+            backdrop-filter: blur(20px);
+            border-radius: 16px;
+            animation: modalSlideIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9) translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
         }
 
             .modal-box input, .modal-box textarea {
@@ -190,6 +205,7 @@
                 padding: 10px;
                 text-align: center;
                 resize: none;
+                border-radius: 6px;
             }
 
                 .modal-box input:focus, .modal-box textarea:focus {
@@ -215,15 +231,16 @@
             position: fixed;
             top: 20px;
             right: -300px;
-            background: var(--primary);
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
             color: #000;
             padding: 12px 20px;
             font-weight: bold;
             z-index: 40000;
             font-size: 0.8rem;
-            border: 2px solid #fff;
-            box-shadow: 5px 5px 0px var(--secondary);
-            transition: right 0.3s ease-in-out;
+            border: none;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+            transition: right 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            border-radius: 8px;
         }
 
             #toast.show {
@@ -235,19 +252,23 @@
             position: fixed;
             top: 15px;
             left: 15px;
-            background: #111;
-            border: 1px solid #333;
-            color: #444;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #888;
             padding: 5px 10px;
             font-size: 0.6rem;
             cursor: pointer;
             z-index: 10001;
-            transition: 0.3s;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            border-radius: 8px;
         }
 
             #auth-trigger:hover {
                 color: var(--primary);
                 border-color: var(--primary);
+                background: linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.08) 100%);
+                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
             }
 
         /* Dev Dashboard */
@@ -256,14 +277,16 @@
             position: fixed;
             bottom: 20px;
             right: 20px;
-            background: #151515;
-            border: 3px solid var(--primary);
+            background: linear-gradient(135deg, #151515 0%, #1a1a2e 100%);
+            border: 2px solid var(--primary);
             padding: 15px;
             z-index: 10000;
-            box-shadow: 8px 8px 0px var(--secondary);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.05);
             width: 250px;
             max-height: 90vh;
             overflow-y: auto;
+            backdrop-filter: blur(10px);
+            border-radius: 8px;
         }
 
             #admin-panel label {
@@ -281,6 +304,7 @@
                 border: 1px solid #444;
                 padding: 8px;
                 margin-bottom: 12px;
+                border-radius: 6px;
             }
 
                 #admin-panel select:focus, #admin-panel input:focus {
@@ -290,14 +314,42 @@
 
         .dash-btn {
             width: 100%;
-            background: var(--primary);
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
             color: #000;
             border: none;
             padding: 10px;
             font-weight: bold;
             cursor: pointer;
             margin-bottom: 5px;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+            border-radius: 8px;
         }
+
+            .dash-btn::after {
+                content: '';
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                width: 0;
+                height: 0;
+                background: rgba(255, 255, 255, 0.2);
+                border-radius: 50%;
+                transform: translate(-50%, -50%);
+                transition: width 0.6s, height 0.6s;
+            }
+
+            .dash-btn:hover {
+                transform: translateY(-3px);
+                box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+            }
+
+            .dash-btn:hover::after {
+                width: 300px;
+                height: 300px;
+            }
 
         .status-grid {
             display: grid;
@@ -311,29 +363,38 @@
                 font-weight: bold;
                 cursor: pointer;
                 font-size: 0.65rem;
+                transition: all 0.3s ease;
+                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            }
+
+            .status-grid button:hover {
+                transform: scale(1.05);
+                box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
             }
 
         .btn-up {
-            background: #00ff00;
+            background: linear-gradient(135deg, #00ff00 0%, #00cc00 100%);
             color: #000;
         }
 
         .btn-down {
-            background: #ff0000;
+            background: linear-gradient(135deg, #ff0000 0%, #cc0000 100%);
             color: #fff;
         }
 
         .container {
             position: relative;
-            border: 4px solid var(--secondary);
+            border: 3px solid var(--secondary);
             padding: 20px 35px;
             width: 100%;
             max-width: 620px;
-            background: #151515;
-            box-shadow: 12px 12px 0px var(--secondary);
+            background: linear-gradient(135deg, #151515 0%, #1a1a2e 100%);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1);
             display: flex;
             flex-direction: column;
             z-index: 10;
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
         }
 
         #theme-dot {
@@ -346,17 +407,38 @@
             background: var(--primary);
             border: none;
             cursor: pointer;
-            box-shadow: 0 0 8px var(--primary);
+            box-shadow: 0 0 15px var(--primary), 0 0 30px var(--primary);
+            transition: all 0.3s ease;
+            animation: dotPulse 2s infinite;
+        }
+
+            #theme-dot:hover {
+                width: 13px;
+                height: 13px;
+                top: 11px;
+                left: 11px;
+            }
+
+        @keyframes dotPulse {
+            0%, 100% { box-shadow: 0 0 15px var(--primary), 0 0 30px var(--primary); }
+            50% { box-shadow: 0 0 25px var(--primary), 0 0 45px var(--primary); }
         }
 
         h1 {
-            font-size: 2.2rem;
-            margin: 0 0 15px 0;
-            color: var(--primary);
-            text-transform: lowercase;
-            text-align: center;
-            letter-spacing: -1px;
-        }
+        font-size: 2.2rem;
+        margin: 0 0 15px 0;
+        background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        text-transform: lowercase;
+        text-align: center;
+        letter-spacing: -1px;
+        filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.3));
+        /* Added these to keep badge inline */
+        display: flex;
+        justify-content: center;
+        align-items: center;
+}
 
         .links {
             display: flex;
@@ -377,14 +459,34 @@
             font-size: 1.05rem;
             text-align: center;
             font-weight: bold;
-            transition: 0.1s;
+            transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
             border: 3px solid;
-            background: #111;
+            background: linear-gradient(135deg, #1a1a1a 0%, #222 100%);
+            position: relative;
+            overflow: hidden;
+            border-radius: 8px;
         }
 
+            a::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: -100%;
+                width: 100%;
+                height: 100%;
+                background: rgba(255, 255, 255, 0.1);
+                transition: left 0.3s ease;
+                z-index: -1;
+            }
+
             a:hover {
-                transform: translate(-3px, -3px);
-                filter: brightness(1.2);
+                transform: translate(-4px, -4px) scale(1.02);
+                filter: brightness(1.3);
+                box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
+            }
+
+            a:hover::before {
+                left: 100%;
             }
 
         .roblox {
@@ -508,16 +610,32 @@
         }
 
         #dev-badge {
-            display: none;
-            background: var(--primary);
-            color: #0d0d0d;
-            font-size: 0.65rem;
-            padding: 2px 6px;
-            border-radius: 3px;
-            margin-left: 8px;
-            vertical-align: middle;
-            font-weight: 900;
-            text-transform: uppercase;
+        display: none;
+        background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+        /* FIX: contrast */
+        color: #000000; 
+        text-shadow: 0 0 2px rgba(255, 255, 255, 0.5);
+        font-size: 0.7rem;
+        padding: 2px 8px;
+        border-radius: 6px;
+        margin-left: 10px;
+        font-weight: 900;
+        text-transform: uppercase;
+        /* FIX: ensure it's not getting clipped */
+        border: 1px solid rgba(255,255,255,0.2);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        animation: badgeGlow 2s infinite;
+        white-space: nowrap;
+}
+
+        /* Utility Classes */
+        .text-center {
+            text-align: center; 
+}
+
+        @keyframes badgeGlow {
+            0%, 100% { box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3); }
+            50% { box-shadow: 0 6px 25px rgba(0, 0, 0, 0.5); }
         }
 
         /* Changelog List specific styles */
@@ -637,9 +755,9 @@
 
     <div id="dev-particles"></div>
 
-    <div id="welcome-overlay">welcome dev.</div>
+    <div id="welcome-overlay">the password definitely wasnt dev123.</div>
     <div id="toast">SYSTEM NOTIFICATION</div>
-    <div id="maint-screen"><h1>SYSTEM OFFLINE</h1><p>Verner is currently tweaking the code.</p></div>
+    <div id="maint-screen"><h1>maintenance</h1><p>nPixel is currently tweaking the code.</p></div>
 
     <div id="auth-modal" class="modal-overlay">
         <div class="modal-box">
@@ -738,9 +856,10 @@
 
         <div style="margin-top:10px;">
             <label style="color:#fff;">MAINTENANCE STATUS</label>
-            <div style="background: #000; border: 1px solid #444; padding: 8px; margin-bottom: 10px; text-align: center; color: var(--primary); font-weight: bold;">
+            <div style="background: #000; border: 1px solid #444; padding: 8px; margin-bottom: 10px; text-align: center; color: var(--primary); font-weight: bold; border-radius: 8px;">
                 <span id="maint-status-display">CHECKING...</span>
             </div>
+            <button class="dash-btn" onclick="cycleGlobalTheme()" style="background:var(--primary); color:#000;">CYCLE GLOBAL THEME</button>
             <button class="dash-btn" onclick="toggleMaint()" style="background:#ff0000; color:#fff;">TOGGLE MAINTENANCE</button>
             <button class="dash-btn" onclick="setDev(false)" style="background:#333; color:#fff;">LOGOUT</button>
         </div>
@@ -749,7 +868,7 @@
     <div class="container">
         <button id="theme-dot" onclick="cycleTheme()"></button>
         <button class="mobile-auth-btn" onclick="adminAuth()" style="display: none;">[AUTH]</button>
-        <h1><span id="live-title">Verner's links</span><span id="dev-badge">Dev</span></h1>
+        <h1><span id="live-title">Verner's links</span><span id="dev-badge">[DEV]</span></h1>
 
         <div class="links">
             <a href="#" id="link-roblox" class="roblox">Roblox</a>
@@ -828,19 +947,29 @@
         };
 
         // --- DEV PARTICLE SYSTEM (MORE + FASTER) ---
-        if (isDev) {
-        const particleContainer = document.getElementById('dev-particles');
-        for (let i = 0; i < 25; i++) {
+       if (isDev) {
+    const particleContainer = document.getElementById('dev-particles');
+    // increased to 60 for more saturation
+    for (let i = 0; i < 60; i++) { 
         let span = document.createElement('span');
         span.innerText = '[DEV]';
         span.className = 'dev-floater';
+        
+        // randomize position
         span.style.top = Math.random() * 100 + 'vh';
         span.style.left = Math.random() * 100 + 'vw';
-        span.style.animationDuration = (3 + Math.random() * 4) + 's';
-        span.style.animationDelay = (Math.random() * 3) + 's';
+        
+        // vary speed
+        span.style.animationDuration = (5 + Math.random() * 10) + 's';
+        span.style.animationDelay = (Math.random() * 5) + 's';
+        
+        // added slight scale variation so they aren't all same size
+        span.style.fontSize = (0.5 + Math.random() * 0.5) + 'rem';
+        span.style.opacity = (0.1 + Math.random() * 0.2); // subtle background effect
+        
         particleContainer.appendChild(span);
-        }
-        }
+    }
+}
 
         // --- THEME SYNC WITH CACHING TO STOP FLICKER ---
         const themes = ["pink", "blue", "red", "green"];
@@ -1060,6 +1189,54 @@
         }
         }, {onlyOnce: true});
         };
+    </script>
+
+    <script>
+    // 1. Load initial cache (runs instantly)
+    const initCache = () => {
+        const cache = {
+            'vipStatus': { id: 'vip-status', key: 'vipStatus' },
+            'currentStatus': { id: 'cur-status', key: 'currentStatus' },
+            'title': { id: 'live-title', key: 'title' }
+        };
+        
+        Object.keys(cache).forEach(cacheKey => {
+            const val = localStorage.getItem(`cache_${cacheKey}`);
+            const el = document.getElementById(cache[cacheKey].id);
+            if (val && el) {
+                if (cacheKey === 'title') {
+                    el.innerText = val;
+                } else {
+                    el.innerText = val;
+                    el.className = 'status ' + (val.includes('WORKING') ? 'status-working' : 'status-down');
+                }
+            }
+        });
+    };
+    initCache();
+
+    // 2. Wrap existing firebase listeners to save to cache automatically
+    // You don't need to import anything new here.
+    // Just find your 'onValue' listeners and add the setItem line inside them.
+
+    // --- FLICKER PREVENTION SYSTEM ---
+// 1. On load: restore from localStorage instantly
+const applyCache = () => {
+    const keys = ['vipStatus', 'currentStatus', 'live-title']; // add your IDs here
+    keys.forEach(id => {
+        const cached = localStorage.getItem(`cache_${id}`);
+        const el = document.getElementById(id);
+        if (cached && el) {
+            if (id === 'live-title') el.innerText = cached;
+            else updateStatusText(id, cached);
+        }
+    });
+};
+applyCache(); // Run this immediately
+
+// 2. Wrap your existing onValue listeners
+// Simply add this line inside your current onValue callbacks for these elements:
+// localStorage.setItem('cache_elementId', newValue);
     </script>
 </body>
 </html>
