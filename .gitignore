@@ -1,0 +1,7 @@
+# ignore these but keep them in your project if you want
+node_modules/
+package.json
+package-lock.json
+.vs/
+index.mp3
+Solution1.slnx
