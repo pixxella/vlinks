@@ -2,8 +2,7 @@
 setlocal
 
 cd /d "%~dp0"
-:: checkout nononononononnoonoononoonoononoono to dev so you're actually committing there
-
+git checkout master
 :parse
 if "%~1"=="" goto :default_commit
 if "%~1"=="-c" goto :set_commit
@@ -32,4 +31,4 @@ git push origin master || (echo Failed to push & exit /b 1)
 :done
 echo Done! Waiting 30 seconds...
 timeout /t 30 >nul
-:: wow wow
+:: wow
