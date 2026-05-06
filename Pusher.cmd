@@ -30,4 +30,5 @@ git push origin master || (echo Failed to push & exit /b 1)
 
 :done
 echo Done! Waiting 30 seconds...
-timeout /t 30
+timeout /t 30 >nul
+:: wow
