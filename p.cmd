@@ -2,7 +2,7 @@
 setlocal
 
 cd /d "%~dp0"
-
+git checkout master
 :parse
 if "%~1"=="" goto :default_commit
 if "%~1"=="-c" goto :set_commit

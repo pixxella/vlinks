@@ -37,7 +37,7 @@ echo committing with message: "%COMMIT_MSG%"
 git commit -m "%COMMIT_MSG%"
 if %errorlevel% neq 0 (
     echo nothing to commit or error occurred
-    goto :done
+    
 )
 
 echo pushing to dev...
@@ -46,14 +46,7 @@ if %errorlevel% neq 0 (
     echo failed to push
     exit /b 1
 )
-
-echo switching back to master...
-git checkout master
-if %errorlevel% neq 0 (
-    echo failed to switch back to master branch
-)
-
-:done
+ 
 echo done! waiting 30 seconds...
 timeout /t 30 >nul
 exit /b 0
