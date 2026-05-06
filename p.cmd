@@ -2,7 +2,7 @@
 setlocal
 
 cd /d "%~dp0"
-git checkout master || (echo Failed to switch to master branch & exit /b 1)
+:: checkout nononononononnoonoononoonoononoono to dev so you're actually committing there
 
 :parse
 if "%~1"=="" goto :default_commit
