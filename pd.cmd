@@ -3,8 +3,12 @@ setlocal
 
 cd /d "%~dp0"
 
-:: force checkout to dev so you're actually committing there
-git checkout dev || echo failed to switch to dev branch & exit /b 1
+:: force checkout to dev
+git checkout dev
+if %errorlevel% neq 0 (
+    echo failed to switch to dev branch. fix your untracked files!
+    exit /b 1
+)
 
 :parse
 if "%~1"=="" goto :default_commit
@@ -23,16 +27,34 @@ goto :parse
 if "%COMMIT_MSG%"=="" set "COMMIT_MSG=auto-commit: %date% %time%"
 
 echo adding files...
-git add . || echo failed to add files & exit /b 1
+git add .
+if %errorlevel% neq 0 (
+    echo failed to add files
+    exit /b 1
+)
 
 echo committing with message: "%COMMIT_MSG%"
-git commit -m "%COMMIT_MSG%" || echo nothing to commit & goto :done
+git commit -m "%COMMIT_MSG%"
+if %errorlevel% neq 0 (
+    echo nothing to commit or error occurred
+    goto :done
+)
 
 echo pushing to dev...
-git push origin dev || echo failed to push & exit /b 1
-git checkout master || echo failed to switch back to master branch
+git push --set-upstream origin dev
+if %errorlevel% neq 0 (
+    echo failed to push
+    exit /b 1
+)
+
+echo switching back to master...
+git checkout master
+if %errorlevel% neq 0 (
+    echo failed to switch back to master branch
+)
 
 :done
 echo done! waiting 30 seconds...
 timeout /t 30 >nul
+exit /b 0
 :: wow
