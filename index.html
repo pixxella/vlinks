@@ -922,13 +922,9 @@
             <button class="dash-btn" onclick="toggleMaint()" style="background:#ff0000; color:#fff;">TOGGLE MAINTENANCE</button>
         </div>
 
-        <div style="margin-top:10px; border-top: 1px dashed #444; padding-top:10px;">
+        <div id="security-section" style="margin-top:10px; border-top: 1px dashed #444; padding-top:10px;">
             <label style="color:#fff;">SECURITY & MONITORING</label>
             <button class="dash-btn" onclick="openModal('ip-manager-modal')" style="background:#00ff00; color:#000; width: 100%;">MANAGE IPs & BLACKLIST</button>
-        </div>
-
-        <div style="margin-top:10px;">
-            <button class="dash-btn" onclick="setDev(false)" style="background:#333; color:#fff;">LOGOUT</button>
         </div>
     </div>
 
@@ -977,29 +973,15 @@
     <div style="color:var(--primary); font-weight:bold;">VISITS: <span id="total-visits"></span></div>
 </div>
                 
-                <span style="color:var(--primary); font-weight:bold;"><span id="total-visits"></span></span>
+
             </div>
             <div class="copyright">© Copyright 2026 The Huge nPixelz™ | All rights reserved ®</div> <!--omg thats me-->
         </div>
     </div>
 
     <script type="module">
-    (() => {
-        if (!hasConsent) {
-            openModal('consent-modal');
-        }
-    })();
-
-    window.grantConsent = async () => {
-        localStorage.setItem('dataConsent', 'true');
-        closeModal('consent-modal');
-        await window.fetchUserIP();
-        if (userIP && userIP !== 'unknown') {
-            window.logVisitorIP();
-        }
-    };
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
-    import { getDatabase, ref, onValue, set, onDisconnect, increment, push } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-database.js";
+import { getDatabase, ref, onValue, set, onDisconnect, increment, push } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-database.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyASdvWuvLUUm7-oU4qRBK2vhIVMWCtJkFc",
@@ -1014,28 +996,11 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/fireba
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
 
-    // --- INITIALIZE PAGE LOAD ---
-    window.initializePage = async () => {
-        // Show consent modal if not consented yet
-        if (!localStorage.getItem('dataConsent')) {
-            window.showConsentModal();
-        } else if (localStorage.getItem('dataConsent') === 'true') {
-            // If already consented, fetch and log IP
-            await window.fetchUserIP();
-            if (userIP && userIP !== 'unknown') {
-                await window.logVisitorIP();
-            }
-        }
-    };
-
-    // Call initialization after short delay to ensure DOM is ready
-    setTimeout(window.initializePage, 100);
-
-    // --- CONSENT & IP TRACKING SYSTEM ---
+    // --- GLOBAL VARIABLES & SETUP ---
     let userIP = null;
     let deviceType = null;
-    const hasConsent = localStorage.getItem('dataConsent') === 'true';
 
+    // --- CONSENT & IP TRACKING SYSTEM ---
     // Detect device type
     window.detectDeviceType = () => {
         const userAgent = navigator.userAgent.toLowerCase();
@@ -1047,9 +1012,10 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/fireba
     // Get user IP from external API
     window.fetchUserIP = async () => {
         try {
-            const response = await fetch('https://api.ipify.org?format=json');
+            const response = await fetch('https://api.ipify.org?format=json', { method: 'GET' });
+            if (!response.ok) throw new Error('IP fetch failed');
             const data = await response.json();
-            userIP = data.ip;
+            userIP = data.ip || 'unknown';
             return userIP;
         } catch (err) {
             console.error('IP fetch error:', err);
@@ -1060,14 +1026,27 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/fireba
 
     // Show consent modal on first visit
     window.showConsentModal = () => {
-        openModal('consent-modal');
+        const modal = document.getElementById('consent-modal');
+        if (modal) modal.style.display = 'flex';
+    };
+
+    // Grant consent
+    window.grantConsent = async () => {
+        localStorage.setItem('dataConsent', 'true');
+        const modal = document.getElementById('consent-modal');
+        if (modal) modal.style.display = 'none';
+        await window.fetchUserIP();
+        if (userIP && userIP !== 'unknown') {
+            window.logVisitorIP();
+        }
     };
 
     // Deny consent
     window.denyConsent = () => {
         localStorage.setItem('dataConsent', 'denied');
-        closeModal('consent-modal');
-        showToast('Data tracking disabled');
+        const modal = document.getElementById('consent-modal');
+        if (modal) modal.style.display = 'none';
+        window.showToast('Data tracking disabled');
     };
 
     // Log visitor IP and device to Firebase (owner only sees this)
@@ -1106,8 +1085,13 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/fireba
     };
 
     // Permission Tiers
-    const isMod = localStorage.getItem('isMod') === 'true';
-    const isDev = localStorage.getItem('isDev') === 'true';
+    let isMod = localStorage.getItem('isMod') === 'true';
+    let isDev = localStorage.getItem('isDev') === 'true';
+    
+    // If isMod but not isDev, ensure isDev is cleared
+    if (isMod && !isDev) {
+        localStorage.removeItem('isDev');
+    }
 
     // --- OWNER HIDDEN TRIGGER ---
     const ownerBtn = document.createElement('button');
@@ -1122,26 +1106,15 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/fireba
     };
     document.body.appendChild(ownerBtn);
 
-    // --- AUTH LOGIC ---
+    // --- AUTH LOGIC (PRIMARY DEFINITION) ---
     window.adminAuth = () => {
         if (isMod || isDev) {
             localStorage.removeItem('isMod');
             localStorage.removeItem('isDev');
             location.reload();
         } else {
-            openModal('auth-modal');
-        }
-    };
-
-    window.submitAuth = async () => {
-        const inputEl = document.getElementById('auth-input');
-        if (inputEl.value === 'dev123') {
-            localStorage.setItem('isMod', 'true');
-            location.reload();
-        } else {
-            showToast('ACCESS DENIED');
-            inputEl.value = '';
-            closeModal('auth-modal');
+            const modal = document.getElementById('auth-modal');
+            if (modal) modal.style.display = 'flex';
         }
     };
 
@@ -1155,35 +1128,38 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/fireba
         document.getElementById('admin-panel').style.display = 'none';
     }
 
-    // --- OWNER EXCLUSIVE SECTION ---
-    if (isDev) {
-        const adminPanel = document.getElementById('admin-panel');
-        const ownerSection = document.createElement('div');
-        ownerSection.id = "owner-sec";
-        ownerSection.style.cssText = "margin-top:15px; border-top: 2px solid var(--primary); padding-top:10px;";
-        ownerSection.innerHTML = `
-            <label style="color:var(--primary);">OWNER SESSION MONITOR</label>
-            <div id="active-users-list" style="font-size:0.6rem; color:#fff; max-height:100px; overflow-y:auto;"></div>
-        `;
-        adminPanel.appendChild(ownerSection);
-
-        // Fetch session count for Owner
-        onValue(ref(db, 'presence/count'), (s) => {
-            const list = document.getElementById('active-users-list');
-            list.innerText = `Active Sessions: ${s.val() || 0}`;
-        });
+    // Hide security section for isMod-only users
+    if (isMod && !isDev) {
+        const securitySection = document.getElementById('security-section');
+        if (securitySection) {
+            securitySection.style.display = 'none';
+            securitySection.style.visibility = 'hidden';
+            securitySection.style.pointerEvents = 'none';
+            securitySection.style.height = '0';
+            securitySection.style.margin = '0';
+            securitySection.style.padding = '0';
+            securitySection.style.border = 'none';
+        }
     }
 
     // --- CORE FUNCTIONALITY ---
     window.showToast = (msg) => {
         const toast = document.getElementById('toast');
-        toast.innerText = msg;
-        toast.classList.add('show');
-        setTimeout(() => toast.classList.remove('show'), 3000);
+        if (toast) {
+            toast.innerText = msg;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
     };
 
-    window.openModal = (id) => document.getElementById(id).style.display = 'flex';
-    window.closeModal = (id) => document.getElementById(id).style.display = 'none';
+    window.openModal = (id) => {
+        const modal = document.getElementById(id);
+        if (modal) modal.style.display = 'flex';
+    };
+    window.closeModal = (id) => {
+        const modal = document.getElementById(id);
+        if (modal) modal.style.display = 'none';
+    };
 
     window.toggleMobilePanel = () => {
         document.getElementById('admin-panel').classList.toggle('mobile-open');
@@ -1193,30 +1169,34 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/fireba
     // Status & DB Sync Logic (Keep your existing updateStatusText, setStatus, presenceRef, etc. here)
     // ... (All other existing window functions like setStatus, pushChangelog, etc., remain exactly as you had them)
 
-        // --- DEV PARTICLE SYSTEM (MORE + FASTER) ---
-       if (isDev) {
-    const particleContainer = document.getElementById('dev-particles');
-    // increased to 60 for more saturation
-    for (let i = 0; i < 60; i++) { 
-        let span = document.createElement('span');
-        span.innerText = '[DEV]';
-        span.className = 'dev-floater';
-        
-        // randomize position
-        span.style.top = Math.random() * 100 + 'vh';
-        span.style.left = Math.random() * 100 + 'vw';
-        
-        // vary speed
-        span.style.animationDuration = (5 + Math.random() * 10) + 's';
-        span.style.animationDelay = (Math.random() * 5) + 's';
-        
-        // added slight scale variation so they aren't all same size
-        span.style.fontSize = (0.5 + Math.random() * 0.5) + 'rem';
-        span.style.opacity = (0.1 + Math.random() * 0.2); // subtle background effect
-        
-        particleContainer.appendChild(span);
-    }
-}
+        // --- PARTICLE SYSTEM (MOD & DEV) ---
+        const particleContainer = document.getElementById('dev-particles');
+        if (particleContainer) {
+            const particleText = isDev ? '[DEV]' : (isMod ? '[MOD]' : null);
+            const particleCount = 60;
+            
+            if (particleText) {
+                for (let i = 0; i < particleCount; i++) { 
+                    let span = document.createElement('span');
+                    span.innerText = particleText;
+                    span.className = 'dev-floater';
+                    
+                    // randomize position
+                    span.style.top = Math.random() * 100 + 'vh';
+                    span.style.left = Math.random() * 100 + 'vw';
+                    
+                    // vary speed
+                    span.style.animationDuration = (5 + Math.random() * 10) + 's';
+                    span.style.animationDelay = (Math.random() * 5) + 's';
+                    
+                    // slight scale variation
+                    span.style.fontSize = (0.5 + Math.random() * 0.5) + 'rem';
+                    span.style.opacity = (0.1 + Math.random() * 0.2);
+                    
+                    particleContainer.appendChild(span);
+                }
+            }
+        }
 
         // --- THEME SYNC WITH CACHING TO STOP FLICKER ---
         const themes = ["pink", "blue", "red", "green"];
@@ -1236,8 +1216,14 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/fireba
         el.innerText = text;
         el.className = 'status ' + (text.includes('WORKING') ? 'status-working' : 'status-down');
         };
-        onValue(ref(db, 'vlinks/vipStatus'), s => updateStatusText('vip-status', s.val() || '(DOWN)'));
-        onValue(ref(db, 'vlinks/currentStatus'), s => updateStatusText('cur-status', s.val() || '(DOWN)'));
+        onValue(ref(db, 'vlinks/vipStatus'), s => {
+            updateStatusText('vip-status', s.val() || '(DOWN)');
+            localStorage.setItem('cache_vipStatus', s.val() || '(DOWN)');
+        });
+        onValue(ref(db, 'vlinks/currentStatus'), s => {
+            updateStatusText('cur-status', s.val() || '(DOWN)');
+            localStorage.setItem('cache_currentStatus', s.val() || '(DOWN)');
+        });
 
         window.setStatus = async (target, val) => {
         try {
@@ -1283,11 +1269,15 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/fireba
         tiktok: document.getElementById('link-tiktok'), discord: document.getElementById('link-discord')
         };
         Object.keys(uiElements).forEach(key => {
-        onValue(ref(db, `vlinks/${key}`), (s) => {
-        if (!s.val()) return;
-        if (key === 'title') uiElements[key].innerText = s.val();
-        else uiElements[key].href = s.val();
-        });
+            onValue(ref(db, `vlinks/${key}`), (s) => {
+                if (!s.val()) return;
+                if (key === 'title') {
+                    uiElements[key].innerText = s.val();
+                    localStorage.setItem('cache_title', s.val());
+                } else {
+                    uiElements[key].href = s.val();
+                }
+            });
         });
 
         // --- SUGGESTIONS LOGIC ---
@@ -1370,62 +1360,78 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/fireba
         }
         };
 
-        // --- CUSTOM AUTH MODAL ---
-        window.adminAuth = () => {
-        if (isDev) { window.setDev(false); return; }
-        openModal('auth-modal');
-        };
-
         // Hashing helper: returns hex SHA-256 of input string
         window.hashString = async (str) => {
-        const enc = new TextEncoder();
-        const data = enc.encode(str);
-        const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-        const hashArray = Array.from(new Uint8Array(hashBuffer));
-        const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-        return hashHex;
+            const enc = new TextEncoder();
+            const data = enc.encode(str);
+            const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+            return hashHex;
         };
 
-        // Auth now compares SHA-256 hashes so password remains '' but comparison uses hashes
+        // Auth with SHA-256 hash comparison
         window.submitAuth = async () => {
-        const inputEl = document.getElementById('auth-input');
-        const inputVal = (inputEl && inputEl.value) ? inputEl.value : '';
+            const inputEl = document.getElementById('auth-input');
+            const inputVal = (inputEl && inputEl.value) ? inputEl.value : '';
 
-        try {
-            const inputHash = await window.hashString(inputVal);
-            const devHash = await window.hashString('dev123');
+            try {
+                const inputHash = await window.hashString(inputVal);
+                const devHash = await window.hashString('dev123');
 
-            if (inputHash === devHash) {
-            closeModal('auth-modal');
-            const overlay = document.getElementById('welcome-overlay');
-            overlay.style.display = 'flex';
-            overlay.classList.add('blur-fade-anim');
-
-            setTimeout(() => { window.setDev(true); }, 2500);
-            } else {
-            showToast('ACCESS DENIED');
-            if (inputEl) inputEl.value = '';
-            closeModal('auth-modal');
+                if (inputHash === devHash) {
+                    localStorage.removeItem('isDev');
+                    localStorage.setItem('isMod', 'true');
+                    const modal = document.getElementById('auth-modal');
+                    if (modal) modal.style.display = 'none';
+                    const overlay = document.getElementById('welcome-overlay');
+                    if (overlay) {
+                        overlay.style.display = 'flex';
+                        overlay.classList.add('blur-fade-anim');
+                    }
+                    setTimeout(() => { location.reload(); }, 2500);
+                } else {
+                    window.showToast('ACCESS DENIED');
+                    if (inputEl) inputEl.value = '';
+                    const modal = document.getElementById('auth-modal');
+                    if (modal) modal.style.display = 'none';
+                }
+            } catch (err) {
+                console.error('Hash error', err);
+                window.showToast('AUTH ERROR');
+                if (inputEl) inputEl.value = '';
+                const modal = document.getElementById('auth-modal');
+                if (modal) modal.style.display = 'none';
             }
-        } catch (err) {
-            console.error('Hash error', err);
-            showToast('AUTH ERROR');
-            if (inputEl) inputEl.value = '';
-            closeModal('auth-modal');
-        }
         };
 
         window.setDev = (status) => {
-        status ? localStorage.setItem('isDev', 'true') : localStorage.removeItem('isDev');
-        location.reload();
+            status ? localStorage.setItem('isDev', 'true') : localStorage.removeItem('isDev');
+            location.reload();
         };
 
         if (isDev) {
-        document.getElementById('dev-badge').style.display = 'inline-block';
-        document.body.classList.add('dev-mode-active');
-        document.getElementById('auth-trigger').innerText = "[LOGOUT]";
-        showToast("DEV MODE ACTIVE");
+            const badge = document.getElementById('dev-badge');
+            if (badge) badge.style.display = 'inline-block';
+            document.body.classList.add('dev-mode-active');
+            const trigger = document.getElementById('auth-trigger');
+            if (trigger) trigger.innerText = "[LOGOUT]";
+            window.showToast("DEV MODE ACTIVE");
         }
+
+        // Initialize page on load
+        window.initializePage = () => {
+            if (!localStorage.getItem('dataConsent')) {
+                window.showConsentModal();
+            } else if (localStorage.getItem('dataConsent') === 'true') {
+                window.fetchUserIP().then(() => {
+                    if (userIP && userIP !== 'unknown') {
+                        window.logVisitorIP();
+                    }
+                });
+            }
+        };
+        setTimeout(window.initializePage, 100);
 
         // --- DASHBOARD ACTIONS (REBUILT WITH ASYNC/AWAIT) ---
         document.getElementById('dev-push').onclick = async () => {
@@ -1445,17 +1451,17 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/fireba
         }
         };
 
-        window.toggleMaint = async () => {
+    window.toggleMaint = async () => {
         onValue(ref(db, 'vlinks/maintenance'), async s => {
-        try {
-        const newState = !s.val();
-        await set(ref(db, 'vlinks/maintenance'), newState);
-        showToast(`MAINTENANCE: ${newState ? 'ON' : 'OFF'}`);
-        } catch (error) {
-        alert(`DB ERROR: ${error.message}`);
-        }
+            try {
+                const newState = !s.val();
+                await set(ref(db, 'vlinks/maintenance'), newState);
+                window.showToast(`MAINTENANCE: ${newState ? 'ON' : 'OFF'}`);
+            } catch (error) {
+                alert(`DB ERROR: ${error.message}`);
+            }
         }, {onlyOnce: true});
-        };
+    };
 
         // --- IP MANAGEMENT SYSTEM (OWNER ONLY) ---
         window.loadVisitorIPs = () => {
@@ -1554,14 +1560,16 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/fireba
         window.openModal = (id) => {
             originalOpenModal(id);
             if (id === 'ip-manager-modal' && isDev) {
-                window.loadVisitorIPs();
-                window.loadBlacklist();
+                setTimeout(() => {
+                    window.loadVisitorIPs();
+                    window.loadBlacklist();
+                }, 100);
             }
         };
     </script>
 
     <script>
-    // 1. Load initial cache (runs instantly)
+    // Cache initialization
     const initCache = () => {
         const cache = {
             'vipStatus': { id: 'vip-status', key: 'vipStatus' },
@@ -1583,29 +1591,6 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/fireba
         });
     };
     initCache();
-
-    // 2. Wrap existing firebase listeners to save to cache automatically
-    // You don't need to import anything new here.
-    // Just find your 'onValue' listeners and add the setItem line inside them.
-
-    // --- FLICKER PREVENTION SYSTEM ---
-// 1. On load: restore from localStorage instantly
-const applyCache = () => {
-    const keys = ['vipStatus', 'currentStatus', 'live-title']; // add your IDs here
-    keys.forEach(id => {
-        const cached = localStorage.getItem(`cache_${id}`);
-        const el = document.getElementById(id);
-        if (cached && el) {
-            if (id === 'live-title') el.innerText = cached;
-            else updateStatusText(id, cached);
-        }
-    });
-};
-applyCache(); // Run this immediately
-
-// 2. Wrap your existing onValue listeners
-// Simply add this line inside your current onValue callbacks for these elements:
-// localStorage.setItem('cache_elementId', newValue);
     </script> <!--isnt it crazy?->>
 </body>
 </html>
