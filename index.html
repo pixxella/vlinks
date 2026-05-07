@@ -272,7 +272,9 @@
 
         /* Dev Dashboard */
         #admin-panel {
-            display: none;
+            display: none !important;
+            visibility: hidden !important;
+            pointer-events: none !important;
             position: fixed;
             bottom: 20px;
             right: 20px;
@@ -281,11 +283,17 @@
             padding: 15px;
             z-index: 10000;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.05);
-            width: 250px;
-            max-height: 90vh;
+            width: 280px;
+            max-height: 95vh;
             overflow-y: auto;
             backdrop-filter: blur(10px);
             border-radius: 8px;
+        }
+
+        #admin-panel.dev-visible {
+            display: block !important;
+            visibility: visible !important;
+            pointer-events: auto !important;
         }
 
             #admin-panel label {
@@ -675,6 +683,8 @@
             /* Hide admin panel by default on mobile */
             #admin-panel {
                 display: none !important;
+                visibility: hidden !important;
+                pointer-events: none !important;
                 position: fixed;
                 bottom: auto;
                 right: auto;
@@ -687,8 +697,18 @@
                 max-height: 80vh;
             }
 
+            #admin-panel.dev-visible {
+                display: flex !important;
+                visibility: visible !important;
+                pointer-events: auto !important;
+                flex-direction: column;
+            }
+
             #admin-panel.mobile-open {
-                display: block !important;
+                display: flex !important;
+                visibility: visible !important;
+                pointer-events: auto !important;
+                flex-direction: column;
             }
 
             /* Mobile toggle button */
@@ -768,16 +788,7 @@
         </div>
     </div>
 
-    <div id="sugg-modal" class="modal-overlay">
-        <div class="modal-box">
-            <div style="color:var(--primary); font-weight:bold;">DROP A SUGGESTION</div>
-            <textarea id="sugg-input" rows="4" placeholder="what should we add..."></textarea>
-            <div class="btn-row">
-                <button onclick="closeModal('sugg-modal')" style="background:#333; color:#fff;">CANCEL</button>
-                <button onclick="submitSuggestion()" style="background:var(--primary); color:#000;">SEND IT</button>
-            </div>
-        </div>
-    </div>
+
 
     <div id="change-modal" class="modal-overlay">
         <div class="modal-box" style="width: 400px; max-height: 60vh; overflow-y: auto;">
@@ -788,14 +799,7 @@
         </div>
     </div>
 
-    <div id="admin-sugg-viewer" class="modal-overlay">
-        <div class="modal-box" style="width: 400px; max-height: 60vh; overflow-y: auto;">
-            <div style="color:var(--primary); font-weight:bold; margin-bottom: 10px;">USER SUGGESTIONS</div>
-            <div id="admin-sugg-list" style="font-size: 0.8rem;">
-            </div>
-            <button onclick="closeModal('admin-sugg-viewer')" style="background:#333; color:#fff; margin-top: 10px;">CLOSE</button>
-        </div>
-    </div>
+
 
     <div id="audio-modal" class="modal-overlay">
         <div class="modal-box" style="width: 500px; height: 450px;">
@@ -803,6 +807,47 @@
             <canvas id="visualizer" width="400" height="100" style="background:#000;"></canvas>
             <div id="ity-grid" style="display:grid; grid-template-columns: repeat(4, 1fr); gap: 5px; font-size: 0.5rem; overflow-y: auto; max-height: 200px;"></div>
             <button onclick="closeModal('audio-modal'); audio.pause();" style="background:#333; color:#fff;">stop</button>
+        </div>
+    </div>
+
+    <!-- CONSENT MODAL -->
+    <div id="consent-modal" class="modal-overlay">
+        <div class="modal-box" style="width: 450px;">
+            <div style="color:var(--primary); font-weight:bold; margin-bottom: 10px;">DATA COLLECTION CONSENT</div>
+            <div style="font-size: 0.75rem; line-height: 1.6; margin-bottom: 15px; max-height: 150px; overflow-y: auto;">
+                <p>This site collects your IP address and device type (mobile/pc) for security and analytics purposes.</p>
+                <p>Your data is encrypted and stored securely. You can withdraw consent anytime.</p>
+                <p>By continuing, you agree to our data collection policy.</p>
+            </div>
+            <div class="btn-row">
+                <button onclick="denyConsent()" style="background:#333; color:#fff;">DENY</button>
+                <button onclick="grantConsent()" style="background:var(--primary); color:#000;">ACCEPT</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- IP MANAGEMENT MODAL (OWNER ONLY) -->
+    <div id="ip-manager-modal" class="modal-overlay">
+        <div class="modal-box" style="width: 500px; max-height: 70vh; overflow-y: auto;">
+            <div style="color:var(--primary); font-weight:bold; margin-bottom: 10px;">IP MANAGEMENT</div>
+            <div style="font-size: 0.75rem; margin-bottom: 15px;">
+                <label style="color:#fff;">ACTIVE IPs</label>
+                <div id="ip-list" style="background: #000; border: 1px solid #333; padding: 8px; max-height: 300px; overflow-y: auto; margin-bottom: 10px; font-size: 0.7rem;">
+                    Loading IPs...
+                </div>
+                <label style="color:#fff;">BLACKLIST IP</label>
+                <div style="display: flex; gap: 5px;">
+                    <input type="text" id="ip-to-blacklist" placeholder="Enter IP to blacklist">
+                    <button onclick="addToBlacklist()" style="background: #ff0000; color: #fff;">BLACKLIST</button>
+                </div>
+                <div id="blacklist-section" style="margin-top: 10px;">
+                    <label style="color:#ff0000;">BLACKLISTED IPs</label>
+                    <div id="blacklist-display" style="background: #1a0000; border: 1px solid #660000; padding: 8px; max-height: 200px; overflow-y: auto; font-size: 0.7rem;">
+                        Loading blacklist...
+                    </div>
+                </div>
+            </div>
+            <button onclick="closeModal('ip-manager-modal')" style="background:#333; color:#fff; width: 100%; margin-top: 10px;">CLOSE</button>
         </div>
     </div>
 
@@ -815,8 +860,6 @@
             <span>USERS ACTIVE: <span id="user-count">1</span></span>
             <button id="mobile-panel-close" class="show" onclick="toggleMobilePanel()" style="background: #333; color: #fff; border: none; padding: 3px 8px; font-size: 0.6rem; cursor: pointer; display: none;">X</button>
         </div>
-
-        <button class="dash-btn" onclick="openModal('admin-sugg-viewer')" style="background:var(--secondary); color:#fff; font-size: 0.75rem;">VIEW USER SUGGESTIONS</button>
 
         <label>VIP SERVER STATUS</label>
         <div class="status-grid">
@@ -859,7 +902,11 @@
             </div>
             <button class="dash-btn" onclick="cycleGlobalTheme()" style="background:var(--primary); color:#000;">CYCLE GLOBAL THEME</button>
             <button class="dash-btn" onclick="toggleMaint()" style="background:#ff0000; color:#fff;">TOGGLE MAINTENANCE</button>
-            <button class="dash-btn" onclick="setDev(false)" style="background:#333; color:#fff;">LOGOUT</button>
+        </div>
+
+        <div id="security-section" style="margin-top:10px; border-top: 1px dashed #444; padding-top:10px;">
+            <label style="color:#fff;">SECURITY & MONITORING</label>
+            <button class="dash-btn" onclick="openModal('ip-manager-modal')" style="background:#00ff00; color:#000; width: 100%;">MANAGE IPs & BLACKLIST</button>
         </div>
     </div>
 
@@ -893,7 +940,6 @@
 
                 <div class="btn-row-small">
                     <button class="src-link" onclick="openModal('change-modal')">[CHANGELOG]</button>
-                    <button class="src-link" onclick="openModal('sugg-modal')">[SUGGESTIONS]</button>
                 </div>
 
                 <span class="one-liner"><strong>made by pxlzfr (nPixelz)</strong> - "i'm the one developing this-" -pixel</span>
@@ -908,17 +954,17 @@
     <div style="color:var(--primary); font-weight:bold;">VISITS: <span id="total-visits"></span></div>
 </div>
                 
-                <span style="color:var(--primary); font-weight:bold;"><span id="total-visits"></span></span>
+
             </div>
             <div class="copyright">© Copyright 2026 The Huge nPixelz™ | All rights reserved ®</div> <!--omg thats me-->
         </div>
     </div>
 
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
-        import { getDatabase, ref, onValue, set, onDisconnect, increment, push } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-database.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
+import { getDatabase, ref, onValue, set, onDisconnect, increment, push } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-database.js";
 
-        const firebaseConfig = {
+    const firebaseConfig = {
         apiKey: "AIzaSyASdvWuvLUUm7-oU4qRBK2vhIVMWCtJkFc",
         authDomain: "vlinks-backend.firebaseapp.com",
         projectId: "vlinks-backend",
@@ -926,56 +972,212 @@
         messagingSenderId: "1054304746220",
         appId: "1:1054304746220:web:758c6a365191abe4ce03c9",
         databaseURL: "https://vlinks-backend-default-rtdb.europe-west1.firebasedatabase.app"
-        };
+    };
 
-        const app = initializeApp(firebaseConfig);
-        const db = getDatabase(app);
-        const isDev = localStorage.getItem('isDev') === 'true';
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
 
+    // --- GLOBAL VARIABLES & SETUP ---
+    let userIP = null;
+    let deviceType = null;
 
-        // --- GLOBAL UI HELPERS ---
-        window.showToast = (msg) => {
-        const toast = document.getElementById('toast');
-        toast.innerText = msg;
-        toast.classList.add('show');
-        setTimeout(() => toast.classList.remove('show'), 3000);
-        };
+    // --- CONSENT & IP TRACKING SYSTEM ---
+    // Detect device type
+    window.detectDeviceType = () => {
+        const userAgent = navigator.userAgent.toLowerCase();
+        const isMobile = /mobile|android|iphone|ipad|phone|blackberry|webos|opera mini/.test(userAgent);
+        return isMobile ? 'mobile' : 'pc';
+    };
+    deviceType = window.detectDeviceType();
 
-        window.openModal = (id) => document.getElementById(id).style.display = 'flex';
-        window.closeModal = (id) => document.getElementById(id).style.display = 'none';
+    // Get user IP from external API
+    window.fetchUserIP = async () => {
+        try {
+            const response = await fetch('https://api.ipify.org?format=json', { method: 'GET' });
+            if (!response.ok) throw new Error('IP fetch failed');
+            const data = await response.json();
+            userIP = data.ip || 'unknown';
+            return userIP;
+        } catch (err) {
+            console.error('IP fetch error:', err);
+            userIP = 'unknown';
+            return userIP;
+        }
+    };
 
-        // Mobile panel toggle
-        window.toggleMobilePanel = () => {
-        const panel = document.getElementById('admin-panel');
-        const closeBtn = document.getElementById('mobile-panel-close');
-        panel.classList.toggle('mobile-open');
-        closeBtn.classList.toggle('show');
-        };
+    // Show consent modal on first visit
+    window.showConsentModal = () => {
+        const modal = document.getElementById('consent-modal');
+        if (modal) modal.style.display = 'flex';
+    };
 
-        // --- DEV PARTICLE SYSTEM (MORE + FASTER) ---
-       if (isDev) {
-    const particleContainer = document.getElementById('dev-particles');
-    // increased to 60 for more saturation
-    for (let i = 0; i < 60; i++) { 
-        let span = document.createElement('span');
-        span.innerText = '[DEV]';
-        span.className = 'dev-floater';
+    // Grant consent
+    window.grantConsent = async () => {
+        localStorage.setItem('dataConsent', 'true');
+        const modal = document.getElementById('consent-modal');
+        if (modal) modal.style.display = 'none';
+        await window.fetchUserIP();
+        if (userIP && userIP !== 'unknown') {
+            window.logVisitorIP();
+        }
+    };
+
+    // Deny consent
+    window.denyConsent = () => {
+        localStorage.setItem('dataConsent', 'denied');
+        const modal = document.getElementById('consent-modal');
+        if (modal) modal.style.display = 'none';
+        window.showToast('Data tracking disabled');
+    };
+
+    // Log visitor IP and device to Firebase (owner only sees this)
+    window.logVisitorIP = async () => {
+        if (!userIP || userIP === 'unknown') return;
         
-        // randomize position
-        span.style.top = Math.random() * 100 + 'vh';
-        span.style.left = Math.random() * 100 + 'vw';
-        
-        // vary speed
-        span.style.animationDuration = (5 + Math.random() * 10) + 's';
-        span.style.animationDelay = (Math.random() * 5) + 's';
-        
-        // added slight scale variation so they aren't all same size
-        span.style.fontSize = (0.5 + Math.random() * 0.5) + 'rem';
-        span.style.opacity = (0.1 + Math.random() * 0.2); // subtle background effect
-        
-        particleContainer.appendChild(span);
+        try {
+            // Check if IP is blacklisted first
+            const blacklistRef = ref(db, 'security/blacklist');
+            let isBlacklisted = false;
+            
+            onValue(blacklistRef, (snap) => {
+                const blacklist = snap.val();
+                if (blacklist && Object.values(blacklist).includes(userIP)) {
+                    isBlacklisted = true;
+                    // Block access
+                    document.body.innerHTML = '<div style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; color: #ff0000; font-family: monospace; font-size: 2rem;"><h1>ACCESS DENIED</h1><p>Your IP is blocked</p></div>';
+                    document.body.style.background = '#000';
+                }
+            }, {onlyOnce: true});
+
+            if (!isBlacklisted) {
+                // Log the IP visit
+                const visitorLog = {
+                    ip: userIP,
+                    device: deviceType,
+                    timestamp: Date.now(),
+                    userAgent: navigator.userAgent
+                };
+                
+                await push(ref(db, 'security/visitor_logs'), visitorLog);
+            }
+        } catch (err) {
+            console.error('Error logging IP:', err);
+        }
+    };
+
+    // Permission Tiers
+    let isMod = localStorage.getItem('isMod') === 'true';
+    let isDev = localStorage.getItem('isDev') === 'true';
+    
+    // If isMod but not isDev, ensure isDev is cleared
+    if (isMod && !isDev) {
+        localStorage.removeItem('isDev');
     }
-}
+
+    // --- OWNER HIDDEN TRIGGER ---
+    const ownerBtn = document.createElement('button');
+    ownerBtn.style = "position:fixed; top:0; right:0; width:10px; height:10px; opacity:0; z-index:99999; cursor:pointer;";
+    ownerBtn.onclick = () => {
+        const pass = prompt("OWNER PASSKEY:");
+        if (pass === "dev1234") {
+            localStorage.setItem('isDev', 'true');
+            localStorage.setItem('isMod', 'true');
+            location.reload();
+        }
+    };
+    document.body.appendChild(ownerBtn);
+
+    // --- AUTH LOGIC (PRIMARY DEFINITION) ---
+    window.adminAuth = () => {
+        if (isMod || isDev) {
+            localStorage.removeItem('isMod');
+            localStorage.removeItem('isDev');
+            location.reload();
+        } else {
+            const modal = document.getElementById('auth-modal');
+            if (modal) modal.style.display = 'flex';
+        }
+    };
+
+    // --- UI/ADMIN PANEL PERMISSIONS ---
+    if (isMod || isDev) {
+        document.getElementById('dev-badge').style.display = 'inline-block';
+        document.getElementById('dev-badge').innerText = isDev ? '[DEV]' : '[MOD]';
+        document.getElementById('auth-trigger').innerText = "[LOGOUT]";
+        document.getElementById('admin-panel').classList.add('dev-visible');
+    } else {
+        document.getElementById('admin-panel').style.display = 'none';
+    }
+
+    // Hide security section for isMod-only users
+    if (isMod && !isDev) {
+        const securitySection = document.getElementById('security-section');
+        if (securitySection) {
+            securitySection.style.display = 'none';
+            securitySection.style.visibility = 'hidden';
+            securitySection.style.pointerEvents = 'none';
+            securitySection.style.height = '0';
+            securitySection.style.margin = '0';
+            securitySection.style.padding = '0';
+            securitySection.style.border = 'none';
+        }
+    }
+
+    // --- CORE FUNCTIONALITY ---
+    window.showToast = (msg) => {
+        const toast = document.getElementById('toast');
+        if (toast) {
+            toast.innerText = msg;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+    };
+
+    window.openModal = (id) => {
+        const modal = document.getElementById(id);
+        if (modal) modal.style.display = 'flex';
+    };
+    window.closeModal = (id) => {
+        const modal = document.getElementById(id);
+        if (modal) modal.style.display = 'none';
+    };
+
+    window.toggleMobilePanel = () => {
+        document.getElementById('admin-panel').classList.toggle('mobile-open');
+        document.getElementById('mobile-panel-close').classList.toggle('show');
+    };
+
+    // Status & DB Sync Logic (Keep your existing updateStatusText, setStatus, presenceRef, etc. here)
+    // ... (All other existing window functions like setStatus, pushChangelog, etc., remain exactly as you had them)
+
+        // --- PARTICLE SYSTEM (MOD & DEV) ---
+        const particleContainer = document.getElementById('dev-particles');
+        if (particleContainer) {
+            const particleText = isDev ? '[DEV]' : (isMod ? '[MOD]' : null);
+            const particleCount = 60;
+            
+            if (particleText) {
+                for (let i = 0; i < particleCount; i++) { 
+                    let span = document.createElement('span');
+                    span.innerText = particleText;
+                    span.className = 'dev-floater';
+                    
+                    // randomize position
+                    span.style.top = Math.random() * 100 + 'vh';
+                    span.style.left = Math.random() * 100 + 'vw';
+                    
+                    // vary speed
+                    span.style.animationDuration = (5 + Math.random() * 10) + 's';
+                    span.style.animationDelay = (Math.random() * 5) + 's';
+                    
+                    // slight scale variation
+                    span.style.fontSize = (0.5 + Math.random() * 0.5) + 'rem';
+                    span.style.opacity = (0.1 + Math.random() * 0.2);
+                    
+                    particleContainer.appendChild(span);
+                }
+            }
+        }
 
         // --- THEME SYNC WITH CACHING TO STOP FLICKER ---
         const themes = ["pink", "blue", "red", "green"];
@@ -995,8 +1197,14 @@
         el.innerText = text;
         el.className = 'status ' + (text.includes('WORKING') ? 'status-working' : 'status-down');
         };
-        onValue(ref(db, 'vlinks/vipStatus'), s => updateStatusText('vip-status', s.val() || '(DOWN)'));
-        onValue(ref(db, 'vlinks/currentStatus'), s => updateStatusText('cur-status', s.val() || '(DOWN)'));
+        onValue(ref(db, 'vlinks/vipStatus'), s => {
+            updateStatusText('vip-status', s.val() || '(DOWN)');
+            localStorage.setItem('cache_vipStatus', s.val() || '(DOWN)');
+        });
+        onValue(ref(db, 'vlinks/currentStatus'), s => {
+            updateStatusText('cur-status', s.val() || '(DOWN)');
+            localStorage.setItem('cache_currentStatus', s.val() || '(DOWN)');
+        });
 
         window.setStatus = async (target, val) => {
         try {
@@ -1042,49 +1250,16 @@
         tiktok: document.getElementById('link-tiktok'), discord: document.getElementById('link-discord')
         };
         Object.keys(uiElements).forEach(key => {
-        onValue(ref(db, `vlinks/${key}`), (s) => {
-        if (!s.val()) return;
-        if (key === 'title') uiElements[key].innerText = s.val();
-        else uiElements[key].href = s.val();
+            onValue(ref(db, `vlinks/${key}`), (s) => {
+                if (!s.val()) return;
+                if (key === 'title') {
+                    uiElements[key].innerText = s.val();
+                    localStorage.setItem('cache_title', s.val());
+                } else {
+                    uiElements[key].href = s.val();
+                }
+            });
         });
-        });
-
-        // --- SUGGESTIONS LOGIC ---
-        window.submitSuggestion = async () => {
-        const input = document.getElementById('sugg-input');
-        if (!input.value.trim()) return showToast("CANNOT SEND EMPTY SUGGESTION");
-
-        try {
-        await push(ref(db, 'vlinks/suggestions'), { text: input.value, time: Date.now() });
-        showToast("SUGGESTION SENT TO DB");
-        input.value = "";
-        closeModal('sugg-modal');
-        } catch (error) {
-        alert(`DB ERROR: ${error.message}`);
-        }
-        };
-
-        // Admin Suggestions Viewer
-        if (isDev) {
-        onValue(ref(db, 'vlinks/suggestions'), (s) => {
-        const list = document.getElementById('admin-sugg-list');
-        list.innerHTML = "";
-        const suggs = s.val();
-        if (!suggs) {
-        list.innerHTML = "<div style='opacity:0.5;'>no suggestions yet...</div>";
-        return;
-        }
-        Object.values(suggs).reverse().forEach(sg => {
-        const dateString = new Date(sg.time).toLocaleDateString();
-        list.innerHTML += `
-        <div class="log-entry">
-        <span class="log-date" style="color:#00ff00;">[${dateString}]</span>
-        ${sg.text}
-        </div>
-        `;
-        });
-        });
-        }
 
         // --- CHANGELOG LOGIC ---
         onValue(ref(db, 'vlinks/changelogs'), (s) => {
@@ -1129,66 +1304,78 @@
         }
         };
 
-        // --- CUSTOM AUTH MODAL ---
-        window.adminAuth = () => {
-        if (isDev) { window.setDev(false); return; }
-        openModal('auth-modal');
-        };
-
         // Hashing helper: returns hex SHA-256 of input string
         window.hashString = async (str) => {
-        const enc = new TextEncoder();
-        const data = enc.encode(str);
-        const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-        const hashArray = Array.from(new Uint8Array(hashBuffer));
-        const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-        return hashHex;
+            const enc = new TextEncoder();
+            const data = enc.encode(str);
+            const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+            return hashHex;
         };
 
-        // Auth now compares SHA-256 hashes so password remains '' but comparison uses hashes
+        // Auth with SHA-256 hash comparison
         window.submitAuth = async () => {
-        const inputEl = document.getElementById('auth-input');
-        const inputVal = (inputEl && inputEl.value) ? inputEl.value : '';
+            const inputEl = document.getElementById('auth-input');
+            const inputVal = (inputEl && inputEl.value) ? inputEl.value : '';
 
-        try {
-            const inputHash = await window.hashString(inputVal);
-            const devHash = await window.hashString('dev123');
+            try {
+                const inputHash = await window.hashString(inputVal);
+                const devHash = await window.hashString('dev123');
 
-            if (inputHash === devHash) {
-            closeModal('auth-modal');
-            const overlay = document.getElementById('welcome-overlay');
-            overlay.style.display = 'flex';
-            overlay.classList.add('blur-fade-anim');
-
-            setTimeout(() => { window.setDev(true); }, 2500);
-            } else {
-            showToast('ACCESS DENIED');
-            if (inputEl) inputEl.value = '';
-            closeModal('auth-modal');
+                if (inputHash === devHash) {
+                    localStorage.removeItem('isDev');
+                    localStorage.setItem('isMod', 'true');
+                    const modal = document.getElementById('auth-modal');
+                    if (modal) modal.style.display = 'none';
+                    const overlay = document.getElementById('welcome-overlay');
+                    if (overlay) {
+                        overlay.style.display = 'flex';
+                        overlay.classList.add('blur-fade-anim');
+                    }
+                    setTimeout(() => { location.reload(); }, 2500);
+                } else {
+                    window.showToast('ACCESS DENIED');
+                    if (inputEl) inputEl.value = '';
+                    const modal = document.getElementById('auth-modal');
+                    if (modal) modal.style.display = 'none';
+                }
+            } catch (err) {
+                console.error('Hash error', err);
+                window.showToast('AUTH ERROR');
+                if (inputEl) inputEl.value = '';
+                const modal = document.getElementById('auth-modal');
+                if (modal) modal.style.display = 'none';
             }
-        } catch (err) {
-            console.error('Hash error', err);
-            showToast('AUTH ERROR');
-            if (inputEl) inputEl.value = '';
-            closeModal('auth-modal');
-        }
         };
 
         window.setDev = (status) => {
-        status ? localStorage.setItem('isDev', 'true') : localStorage.removeItem('isDev');
-        location.reload();
+            status ? localStorage.setItem('isDev', 'true') : localStorage.removeItem('isDev');
+            location.reload();
         };
 
         if (isDev) {
-        document.getElementById('dev-badge').style.display = 'inline-block';
-        const isMobile = window.innerWidth <= 600;
-        if (!isMobile) {
-        document.getElementById('admin-panel').style.display = 'block';
+            const badge = document.getElementById('dev-badge');
+            if (badge) badge.style.display = 'inline-block';
+            document.body.classList.add('dev-mode-active');
+            const trigger = document.getElementById('auth-trigger');
+            if (trigger) trigger.innerText = "[LOGOUT]";
+            window.showToast("DEV MODE ACTIVE");
         }
-        document.body.classList.add('dev-mode-active');
-        document.getElementById('auth-trigger').innerText = "[LOGOUT]";
-        showToast("DEV MODE ACTIVE");
-        }
+
+        // Initialize page on load
+        window.initializePage = () => {
+            if (!localStorage.getItem('dataConsent')) {
+                window.showConsentModal();
+            } else if (localStorage.getItem('dataConsent') === 'true') {
+                window.fetchUserIP().then(() => {
+                    if (userIP && userIP !== 'unknown') {
+                        window.logVisitorIP();
+                    }
+                });
+            }
+        };
+        setTimeout(window.initializePage, 100);
 
         // --- DASHBOARD ACTIONS (REBUILT WITH ASYNC/AWAIT) ---
         document.getElementById('dev-push').onclick = async () => {
@@ -1208,21 +1395,125 @@
         }
         };
 
-        window.toggleMaint = async () => {
+    window.toggleMaint = async () => {
         onValue(ref(db, 'vlinks/maintenance'), async s => {
-        try {
-        const newState = !s.val();
-        await set(ref(db, 'vlinks/maintenance'), newState);
-        showToast(`MAINTENANCE: ${newState ? 'ON' : 'OFF'}`);
-        } catch (error) {
-        alert(`DB ERROR: ${error.message}`);
-        }
+            try {
+                const newState = !s.val();
+                await set(ref(db, 'vlinks/maintenance'), newState);
+                window.showToast(`MAINTENANCE: ${newState ? 'ON' : 'OFF'}`);
+            } catch (error) {
+                alert(`DB ERROR: ${error.message}`);
+            }
         }, {onlyOnce: true});
+    };
+
+        // --- IP MANAGEMENT SYSTEM (OWNER ONLY) ---
+        window.loadVisitorIPs = () => {
+            onValue(ref(db, 'security/visitor_logs'), (snap) => {
+                const ipList = document.getElementById('ip-list');
+                const logs = snap.val();
+                
+                if (!logs) {
+                    ipList.innerHTML = '<div style="color: #888;">No visitor logs yet</div>';
+                    return;
+                }
+
+                // Group by IP and get latest
+                const ipMap = {};
+                Object.values(logs).forEach(log => {
+                    if (!ipMap[log.ip]) {
+                        ipMap[log.ip] = log;
+                    } else if (log.timestamp > ipMap[log.ip].timestamp) {
+                        ipMap[log.ip] = log;
+                    }
+                });
+
+                let html = '';
+                Object.entries(ipMap).forEach(([ip, data]) => {
+                    const date = new Date(data.timestamp).toLocaleString();
+                    html += `
+                    <div style="background: #1a1a1a; padding: 8px; margin: 5px 0; border-left: 3px solid var(--primary); word-break: break-all;">
+                        <div style="color: var(--primary); font-weight: bold;">${ip}</div>
+                        <div style="color: #888; font-size: 0.65rem;">Device: ${data.device}</div>
+                        <div style="color: #888; font-size: 0.65rem;">Last: ${date}</div>
+                        <button onclick="addToBlacklist('${ip}')" style="background: #ff0000; color: #fff; border: none; padding: 3px 6px; cursor: pointer; margin-top: 5px; font-size: 0.65rem;">BLACKLIST</button>
+                    </div>
+                    `;
+                });
+                
+                ipList.innerHTML = html;
+            });
+        };
+
+        window.addToBlacklist = async (ip) => {
+            const ipToBlacklist = ip || document.getElementById('ip-to-blacklist').value;
+            
+            if (!ipToBlacklist.trim()) {
+                showToast('ENTER AN IP FIRST');
+                return;
+            }
+
+            try {
+                await push(ref(db, 'security/blacklist'), ipToBlacklist);
+                showToast(`IP ${ipToBlacklist} BLACKLISTED`);
+                document.getElementById('ip-to-blacklist').value = '';
+                window.loadBlacklist();
+                window.loadVisitorIPs();
+            } catch (error) {
+                alert(`ERROR: ${error.message}`);
+            }
+        };
+
+        window.loadBlacklist = () => {
+            onValue(ref(db, 'security/blacklist'), (snap) => {
+                const blacklistDisplay = document.getElementById('blacklist-display');
+                const blacklist = snap.val();
+
+                if (!blacklist) {
+                    blacklistDisplay.innerHTML = '<div style="color: #888;">No blacklisted IPs</div>';
+                    return;
+                }
+
+                let html = '';
+                Object.entries(blacklist).forEach(([key, ip]) => {
+                    html += `
+                    <div style="background: #2a0a0a; padding: 8px; margin: 5px 0; border-left: 3px solid #ff0000; display: flex; justify-content: space-between; align-items: center; word-break: break-all;">
+                        <span style="color: #ff0000;">${ip}</span>
+                        <button onclick="removeFromBlacklist('${key}')" style="background: #00ff00; color: #000; border: none; padding: 3px 6px; cursor: pointer; font-size: 0.65rem;">REMOVE</button>
+                    </div>
+                    `;
+                });
+
+                blacklistDisplay.innerHTML = html;
+            });
+        };
+
+        window.removeFromBlacklist = async (key) => {
+            try {
+                await set(ref(db, `security/blacklist/${key}`), null);
+                showToast('IP REMOVED FROM BLACKLIST');
+                window.loadBlacklist();
+                window.loadVisitorIPs();
+            } catch (error) {
+                alert(`ERROR: ${error.message}`);
+            }
+        };
+
+        // Load IP/blacklist data when dev mode is active and modal opens
+        const originalOpenModal = window.openModal;
+        window.openModal = (id) => {
+            originalOpenModal(id);
+            if (id === 'ip-manager-modal' && isDev) {
+                setTimeout(() => {
+                    window.loadVisitorIPs();
+                    window.loadBlacklist();
+                }, 100);
+            }
         };
     </script>
 
     <script>
-    // 1. Load initial cache (runs instantly)
+    // Cache initialization
     const initCache = () => {
         const cache = {
             'vipStatus': { id: 'vip-status', key: 'vipStatus' },
@@ -1244,29 +1535,6 @@
         });
     };
     initCache();
-
-    // 2. Wrap existing firebase listeners to save to cache automatically
-    // You don't need to import anything new here.
-    // Just find your 'onValue' listeners and add the setItem line inside them.
-
-    // --- FLICKER PREVENTION SYSTEM ---
-// 1. On load: restore from localStorage instantly
-const applyCache = () => {
-    const keys = ['vipStatus', 'currentStatus', 'live-title']; // add your IDs here
-    keys.forEach(id => {
-        const cached = localStorage.getItem(`cache_${id}`);
-        const el = document.getElementById(id);
-        if (cached && el) {
-            if (id === 'live-title') el.innerText = cached;
-            else updateStatusText(id, cached);
-        }
-    });
-};
-applyCache(); // Run this immediately
-
-// 2. Wrap your existing onValue listeners
-// Simply add this line inside your current onValue callbacks for these elements:
-// localStorage.setItem('cache_elementId', newValue);
     </script> <!--isnt it crazy?->>
 </body>
 </html>
