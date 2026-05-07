@@ -872,7 +872,7 @@
             <button class="btn-down" onclick="setStatus('currentStatus', '(DOWN)')">DOWN</button>
         </div>
 
-        <div style="margin-top:15px; border-top: 1px dashed #444; padding-top:10px;">
+        <div id="changelog-pusher-section" style="margin-top:15px; border-top: 1px dashed #444; padding-top:10px;">
             <label style="color:#fff;">PUSH CHANGELOG UPDATE</label>
             <input type="text" id="dev-change-input" placeholder="Fixed a bug...">
             <button class="dash-btn" onclick="pushChangelog()" style="background:#fff; color:#000;">ADD CHANGELOG</button>
@@ -1119,6 +1119,20 @@ import { getDatabase, ref, onValue, set, onDisconnect, increment, push } from "h
             securitySection.style.margin = '0';
             securitySection.style.padding = '0';
             securitySection.style.border = 'none';
+        }
+    }
+
+    // Hide changelog pusher for isMod-only users (only show for isDev)
+    if (!isDev) {
+        const changelogPusher = document.getElementById('changelog-pusher-section');
+        if (changelogPusher) {
+            changelogPusher.style.display = 'none';
+            changelogPusher.style.visibility = 'hidden';
+            changelogPusher.style.pointerEvents = 'none';
+            changelogPusher.style.height = '0';
+            changelogPusher.style.margin = '0';
+            changelogPusher.style.padding = '0';
+            changelogPusher.style.border = 'none';
         }
     }
 
