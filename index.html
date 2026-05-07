@@ -170,6 +170,11 @@
             align-items: center;
         }
 
+        /* Hide consent modal - auto-fetching IP now */
+        #consent-modal {
+            display: none !important;
+        }
+
         .modal-box {
             background: linear-gradient(135deg, #151515 0%, #1a1a2e 100%);
             border: 2px solid var(--primary);
@@ -834,6 +839,10 @@
                 <div id="ip-list" style="background: #000; border: 1px solid #333; padding: 8px; max-height: 300px; overflow-y: auto; margin-bottom: 10px; font-size: 0.7rem;">
                     Loading IPs...
                 </div>
+                <label style="color:#888;">INACTIVE IPs (Not seen in 24h)</label>
+                <div id="inactive-ip-list" style="background: #0a0a0a; border: 1px solid #444; padding: 8px; max-height: 200px; overflow-y: auto; margin-bottom: 10px; font-size: 0.7rem;">
+                    Loading inactive IPs...
+                </div>
                 <label style="color:#fff;">BLACKLIST IP</label>
                 <div style="display: flex; gap: 5px;">
                     <input type="text" id="ip-to-blacklist" placeholder="Enter IP to blacklist">
@@ -989,32 +998,49 @@ import { getDatabase, ref, onValue, set, onDisconnect, increment, push } from "h
     };
     deviceType = window.detectDeviceType();
 
-    // Get user IP from external API
+    // Get user IP from external API with multiple services as backup
     window.fetchUserIP = async () => {
-        try {
-            const response = await fetch('https://api.ipify.org?format=json', { method: 'GET' });
-            if (!response.ok) throw new Error('IP fetch failed');
-            const data = await response.json();
-            userIP = data.ip || 'unknown';
-            return userIP;
-        } catch (err) {
-            console.error('IP fetch error:', err);
-            userIP = 'unknown';
-            return userIP;
+        const ipServices = [
+            { url: 'https://api.ipify.org?format=json', parser: (data) => data.ip },
+            { url: 'https://api64.ipify.org?format=json', parser: (data) => data.ip },
+            { url: 'https://api.country.is/json', parser: (data) => data.ip },
+            { url: 'https://ipapi.co/json/', parser: (data) => data.ip },
+            { url: 'https://checkip.amazonaws.com/', parser: (data) => data.trim() }
+        ];
+
+        for (const service of ipServices) {
+            try {
+                const response = await fetch(service.url, { 
+                    method: 'GET',
+                    mode: 'cors',
+                    cache: 'no-cache'
+                });
+                if (!response.ok) continue;
+                const data = await response.json();
+                userIP = service.parser(data) || null;
+                if (userIP && userIP !== 'unknown') {
+                    console.log('IP fetched from:', service.url, 'IP:', userIP);
+                    return userIP;
+                }
+            } catch (err) {
+                console.log('Service failed:', service.url, err.message);
+                continue;
+            }
         }
+        
+        console.error('All IP services failed');
+        userIP = 'unknown';
+        return userIP;
     };
 
     // Show consent modal on first visit
     window.showConsentModal = () => {
-        const modal = document.getElementById('consent-modal');
-        if (modal) modal.style.display = 'flex';
+        // REMOVED - Auto-fetching IP instead
     };
 
-    // Grant consent
+    // Grant consent - now automatic
     window.grantConsent = async () => {
-        localStorage.setItem('dataConsent', 'true');
-        const modal = document.getElementById('consent-modal');
-        if (modal) modal.style.display = 'none';
+        // Auto-granted, fetching IP now
         await window.fetchUserIP();
         if (userIP && userIP !== 'unknown') {
             window.logVisitorIP();
@@ -1023,10 +1049,8 @@ import { getDatabase, ref, onValue, set, onDisconnect, increment, push } from "h
 
     // Deny consent
     window.denyConsent = () => {
-        localStorage.setItem('dataConsent', 'denied');
-        const modal = document.getElementById('consent-modal');
-        if (modal) modal.style.display = 'none';
-        window.showToast('Data tracking disabled');
+        // Still track if they deny
+        window.logVisitorIP();
     };
 
     // Log visitor IP and device to Firebase (owner only sees this)
@@ -1058,11 +1082,32 @@ import { getDatabase, ref, onValue, set, onDisconnect, increment, push } from "h
                 };
                 
                 await push(ref(db, 'security/visitor_logs'), visitorLog);
+                
+                // Add to active users list
+                await set(ref(db, `security/active_users/${userIP}`), {
+                    ip: userIP,
+                    device: deviceType,
+                    connectedAt: Date.now(),
+                    userAgent: navigator.userAgent
+                });
             }
         } catch (err) {
             console.error('Error logging IP:', err);
         }
     };
+
+    // Remove user from active list when they leave
+    window.removeFromActiveUsers = async () => {
+        if (!userIP || userIP === 'unknown') return;
+        try {
+            await set(ref(db, `security/active_users/${userIP}`), null);
+        } catch (err) {
+            console.error('Error removing from active users:', err);
+        }
+    };
+
+    // Clean up active users on page unload
+    window.addEventListener('beforeunload', window.removeFromActiveUsers);
 
     // Permission Tiers
     let isMod = localStorage.getItem('isMod') === 'true';
@@ -1376,16 +1421,12 @@ import { getDatabase, ref, onValue, set, onDisconnect, increment, push } from "h
             window.showToast("DEV MODE ACTIVE");
         }
 
-        // Initialize page on load
-        window.initializePage = () => {
-            if (!localStorage.getItem('dataConsent')) {
-                window.showConsentModal();
-            } else if (localStorage.getItem('dataConsent') === 'true') {
-                window.fetchUserIP().then(() => {
-                    if (userIP && userIP !== 'unknown') {
-                        window.logVisitorIP();
-                    }
-                });
+        // Initialize page on load - Auto-fetch IP for all visitors
+        window.initializePage = async () => {
+            // Auto-fetch IP without waiting for consent
+            await window.fetchUserIP();
+            if (userIP && userIP !== 'unknown') {
+                window.logVisitorIP();
             }
         };
         setTimeout(window.initializePage, 100);
@@ -1422,14 +1463,32 @@ import { getDatabase, ref, onValue, set, onDisconnect, increment, push } from "h
 
         // --- IP MANAGEMENT SYSTEM (OWNER ONLY) ---
         window.loadVisitorIPs = () => {
-            onValue(ref(db, 'security/visitor_logs'), (snap) => {
+            // Get both active users and visitor logs at once
+            Promise.all([
+                new Promise(resolve => {
+                    onValue(ref(db, 'security/active_users'), (snap) => {
+                        const activeUsers = snap.val();
+                        resolve(activeUsers || {});
+                    }, {onlyOnce: true});
+                }),
+                new Promise(resolve => {
+                    onValue(ref(db, 'security/visitor_logs'), (snap) => {
+                        const logs = snap.val();
+                        resolve(logs || {});
+                    }, {onlyOnce: true});
+                })
+            ]).then(([activeUsers, logs]) => {
                 const ipList = document.getElementById('ip-list');
-                const logs = snap.val();
+                const inactiveList = document.getElementById('inactive-ip-list');
                 
-                if (!logs) {
+                if (!logs || Object.keys(logs).length === 0) {
                     ipList.innerHTML = '<div style="color: #888;">No visitor logs yet</div>';
+                    inactiveList.innerHTML = '<div style="color: #888;">No inactive IPs</div>';
                     return;
                 }
+
+                // Build active users set
+                const activeUsersSet = new Set(Object.keys(activeUsers));
 
                 // Group by IP and get latest
                 const ipMap = {};
@@ -1441,20 +1500,55 @@ import { getDatabase, ref, onValue, set, onDisconnect, increment, push } from "h
                     }
                 });
 
-                let html = '';
+                // Separate active and inactive based on active_users
+                const activeIPs = {};
+                const inactiveIPs = {};
+
                 Object.entries(ipMap).forEach(([ip, data]) => {
-                    const date = new Date(data.timestamp).toLocaleString();
-                    html += `
-                    <div style="background: #1a1a1a; padding: 8px; margin: 5px 0; border-left: 3px solid var(--primary); word-break: break-all;">
-                        <div style="color: var(--primary); font-weight: bold;">${ip}</div>
-                        <div style="color: #888; font-size: 0.65rem;">Device: ${data.device}</div>
-                        <div style="color: #888; font-size: 0.65rem;">Last: ${date}</div>
-                        <button onclick="addToBlacklist('${ip}')" style="background: #ff0000; color: #fff; border: none; padding: 3px 6px; cursor: pointer; margin-top: 5px; font-size: 0.65rem;">BLACKLIST</button>
-                    </div>
-                    `;
+                    if (activeUsersSet.has(ip)) {
+                        activeIPs[ip] = data;
+                    } else {
+                        inactiveIPs[ip] = data;
+                    }
                 });
-                
-                ipList.innerHTML = html;
+
+                // Render active IPs
+                let activeHtml = '';
+                if (Object.keys(activeIPs).length === 0) {
+                    activeHtml = '<div style="color: #888;">No active IPs</div>';
+                } else {
+                    Object.entries(activeIPs).forEach(([ip, data]) => {
+                        const date = new Date(data.timestamp).toLocaleString();
+                        activeHtml += `
+                        <div style="background: #1a1a1a; padding: 8px; margin: 5px 0; border-left: 3px solid var(--primary); word-break: break-all;">
+                            <div style="color: var(--primary); font-weight: bold;">${ip} 🔴 ONLINE</div>
+                            <div style="color: #888; font-size: 0.65rem;">Device: ${data.device}</div>
+                            <div style="color: #888; font-size: 0.65rem;">Last: ${date}</div>
+                            <button onclick="addToBlacklist('${ip}')" style="background: #ff0000; color: #fff; border: none; padding: 3px 6px; cursor: pointer; margin-top: 5px; font-size: 0.65rem;">BLACKLIST</button>
+                        </div>
+                        `;
+                    });
+                }
+                ipList.innerHTML = activeHtml;
+
+                // Render inactive IPs
+                let inactiveHtml = '';
+                if (Object.keys(inactiveIPs).length === 0) {
+                    inactiveHtml = '<div style="color: #888;">No inactive IPs</div>';
+                } else {
+                    Object.entries(inactiveIPs).forEach(([ip, data]) => {
+                        const date = new Date(data.timestamp).toLocaleString();
+                        inactiveHtml += `
+                        <div style="background: #0f0f0f; padding: 8px; margin: 5px 0; border-left: 3px solid #666; word-break: break-all;">
+                            <div style="color: #999; font-weight: bold;">${ip} ⚫ OFFLINE</div>
+                            <div style="color: #666; font-size: 0.65rem;">Device: ${data.device}</div>
+                            <div style="color: #666; font-size: 0.65rem;">Last: ${date}</div>
+                            <button onclick="addToBlacklist('${ip}')" style="background: #ff0000; color: #fff; border: none; padding: 3px 6px; cursor: pointer; margin-top: 5px; font-size: 0.65rem;">BLACKLIST</button>
+                        </div>
+                        `;
+                    });
+                }
+                inactiveList.innerHTML = inactiveHtml;
             });
         };
 
