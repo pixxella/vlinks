@@ -788,16 +788,7 @@
         </div>
     </div>
 
-    <div id="sugg-modal" class="modal-overlay">
-        <div class="modal-box">
-            <div style="color:var(--primary); font-weight:bold;">DROP A SUGGESTION</div>
-            <textarea id="sugg-input" rows="4" placeholder="what should we add..."></textarea>
-            <div class="btn-row">
-                <button onclick="closeModal('sugg-modal')" style="background:#333; color:#fff;">CANCEL</button>
-                <button onclick="submitSuggestion()" style="background:var(--primary); color:#000;">SEND IT</button>
-            </div>
-        </div>
-    </div>
+
 
     <div id="change-modal" class="modal-overlay">
         <div class="modal-box" style="width: 400px; max-height: 60vh; overflow-y: auto;">
@@ -808,14 +799,7 @@
         </div>
     </div>
 
-    <div id="admin-sugg-viewer" class="modal-overlay">
-        <div class="modal-box" style="width: 400px; max-height: 60vh; overflow-y: auto;">
-            <div style="color:var(--primary); font-weight:bold; margin-bottom: 10px;">USER SUGGESTIONS</div>
-            <div id="admin-sugg-list" style="font-size: 0.8rem;">
-            </div>
-            <button onclick="closeModal('admin-sugg-viewer')" style="background:#333; color:#fff; margin-top: 10px;">CLOSE</button>
-        </div>
-    </div>
+
 
     <div id="audio-modal" class="modal-overlay">
         <div class="modal-box" style="width: 500px; height: 450px;">
@@ -876,8 +860,6 @@
             <span>USERS ACTIVE: <span id="user-count">1</span></span>
             <button id="mobile-panel-close" class="show" onclick="toggleMobilePanel()" style="background: #333; color: #fff; border: none; padding: 3px 8px; font-size: 0.6rem; cursor: pointer; display: none;">X</button>
         </div>
-
-        <button class="dash-btn" onclick="openModal('admin-sugg-viewer')" style="background:var(--secondary); color:#fff; font-size: 0.75rem;">VIEW USER SUGGESTIONS</button>
 
         <label>VIP SERVER STATUS</label>
         <div class="status-grid">
@@ -958,7 +940,6 @@
 
                 <div class="btn-row-small">
                     <button class="src-link" onclick="openModal('change-modal')">[CHANGELOG]</button>
-                    <button class="src-link" onclick="openModal('sugg-modal')">[SUGGESTIONS]</button>
                 </div>
 
                 <span class="one-liner"><strong>made by pxlzfr (nPixelz)</strong> - "i'm the one developing this-" -pixel</span>
@@ -1279,43 +1260,6 @@ import { getDatabase, ref, onValue, set, onDisconnect, increment, push } from "h
                 }
             });
         });
-
-        // --- SUGGESTIONS LOGIC ---
-        window.submitSuggestion = async () => {
-        const input = document.getElementById('sugg-input');
-        if (!input.value.trim()) return showToast("CANNOT SEND EMPTY SUGGESTION");
-
-        try {
-        await push(ref(db, 'vlinks/suggestions'), { text: input.value, time: Date.now() });
-        showToast("SUGGESTION SENT TO DB");
-        input.value = "";
-        closeModal('sugg-modal');
-        } catch (error) {
-        alert(`DB ERROR: ${error.message}`);
-        }
-        };
-
-        // Admin Suggestions Viewer
-        if (isDev) {
-        onValue(ref(db, 'vlinks/suggestions'), (s) => {
-        const list = document.getElementById('admin-sugg-list');
-        list.innerHTML = "";
-        const suggs = s.val();
-        if (!suggs) {
-        list.innerHTML = "<div style='opacity:0.5;'>no suggestions yet...</div>";
-        return;
-        }
-        Object.values(suggs).reverse().forEach(sg => {
-        const dateString = new Date(sg.time).toLocaleDateString();
-        list.innerHTML += `
-        <div class="log-entry">
-        <span class="log-date" style="color:#00ff00;">[${dateString}]</span>
-        ${sg.text}
-        </div>
-        `;
-        });
-        });
-        }
 
         // --- CHANGELOG LOGIC ---
         onValue(ref(db, 'vlinks/changelogs'), (s) => {
