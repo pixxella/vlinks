@@ -984,11 +984,11 @@
     </div>
 
     <script type="module">
-    => {
+    (() => {
         if (!hasConsent) {
             openModal('consent-modal');
         }
-    };
+    })();
 
     window.grantConsent = async () => {
         localStorage.setItem('dataConsent', 'true');
@@ -1059,7 +1059,11 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/fireba
     };
 
     // Show consent modal on first visit
-    window.showConsentModal = () 
+    window.showConsentModal = () => {
+        openModal('consent-modal');
+    };
+
+    // Deny consent
     window.denyConsent = () => {
         localStorage.setItem('dataConsent', 'denied');
         closeModal('consent-modal');
@@ -1147,25 +1151,27 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/fireba
         document.getElementById('dev-badge').innerText = isDev ? '[DEV]' : '[MOD]';
         document.getElementById('auth-trigger').innerText = "[LOGOUT]";
         document.getElementById('admin-panel').classList.add('dev-visible');
+    } else {
+        document.getElementById('admin-panel').style.display = 'none';
+    }
 
-        // --- OWNER EXCLUSIVE SECTION ---
-        if (isDev) {
-            const adminPanel = document.getElementById('admin-panel');
-            const ownerSection = document.createElement('div');
-            ownerSection.id = "owner-sec";
-            ownerSection.style.cssText = "margin-top:15px; border-top: 2px solid var(--primary); padding-top:10px;";
-            ownerSection.innerHTML = `
-                <label style="color:var(--primary);">OWNER SESSION MONITOR</label>
-                <div id="active-users-list" style="font-size:0.6rem; color:#fff; max-height:100px; overflow-y:auto;"></div>
-            `;
-            adminPanel.appendChild(ownerSection);
+    // --- OWNER EXCLUSIVE SECTION ---
+    if (isDev) {
+        const adminPanel = document.getElementById('admin-panel');
+        const ownerSection = document.createElement('div');
+        ownerSection.id = "owner-sec";
+        ownerSection.style.cssText = "margin-top:15px; border-top: 2px solid var(--primary); padding-top:10px;";
+        ownerSection.innerHTML = `
+            <label style="color:var(--primary);">OWNER SESSION MONITOR</label>
+            <div id="active-users-list" style="font-size:0.6rem; color:#fff; max-height:100px; overflow-y:auto;"></div>
+        `;
+        adminPanel.appendChild(ownerSection);
 
-            // Fetch session count for Owner
-            onValue(ref(db, 'presence/count'), (s) => {
-                const list = document.getElementById('active-users-list');
-                list.innerText = `Active Sessions: ${s.val() || 0}`;
-            });
-        }
+        // Fetch session count for Owner
+        onValue(ref(db, 'presence/count'), (s) => {
+            const list = document.getElementById('active-users-list');
+            list.innerText = `Active Sessions: ${s.val() || 0}`;
+        });
     }
 
     // --- CORE FUNCTIONALITY ---
