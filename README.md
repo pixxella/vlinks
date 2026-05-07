@@ -1,5 +1,5 @@
 # 🔗 vLinks - Advanced Link Aggregator
-**Website:** [https://pixxella.github.io/VernersIoPage](https://pixxella.github.io/VernersIoPage)
+## **Website:** [https://pixxella.github.io/vlinks](https://pixxella.github.io/vlinks)
 
 > A modern, real-time link sharing platform with developer controls, live status updates, and user engagement tracking.
 
