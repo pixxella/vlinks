@@ -12,7 +12,7 @@
         document.documentElement.setAttribute('data-theme', savedTheme);
     </script>
 
-    <style>
+    <style> 
         :root {
             --primary: #ffa2fd;
             --secondary: #a349a4;
@@ -397,9 +397,9 @@
         .container {
             position: relative;
             border: 3px solid var(--secondary);
-            padding: 20px 35px;
+            padding: 27px 43.5px;
             width: 100%;
-            max-width: 620px;
+            max-width: 666px;
             background: linear-gradient(135deg, #151515 0%, #1a1a2e 100%);
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1);
             display: flex;
@@ -437,8 +437,8 @@
         }
 
         h1 {
-        font-size: 2.2rem;
-        margin: 0 0 15px 0;
+        font-size: 2.5rem;
+        margin: 0 0 20px 0;
         background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
@@ -454,7 +454,7 @@
         .links {
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 12px;
         }
 
         .link-group {
@@ -466,8 +466,8 @@
         a {
             color: #fff;
             text-decoration: none;
-            padding: 12px;
-            font-size: 1.05rem;
+            padding: 16px;
+            font-size: 1.2rem;
             text-align: center;
             font-weight: bold;
             transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
@@ -513,8 +513,8 @@
         }
 
         .tiktok {
-            border-image: linear-gradient(45deg, #ff0050, #00f2ea) 1;
-            border-width: 3px;
+            border-color: #ff0050 #ff0050 #ff0050 #ff0050;
+            border-radius: 12px;
         }
 
         .discord {
@@ -524,11 +524,6 @@
         .server-vip {
             border-color: #ffd700 #b8860b #b8860b #ffd700;
             color: #f9d824;
-        }
-
-        .server-current {
-            border-color: #00ff41 #008f11 #008f11 #00ff41;
-            color: #47fd48;
         }
 
         .src-link {
@@ -541,6 +536,20 @@
             cursor: pointer;
             padding: 8px;
             border-style: dashed;
+            flex: 1;
+        }
+
+        .src-code-btn {
+            border-color: #666;
+            font-size: 0.65rem;
+            opacity: 0.4;
+            margin-top: 5px;
+            background: transparent;
+            color: #888;
+            cursor: pointer;
+            padding: 5px;
+            border-style: dashed;
+            border-width: 1px;
             flex: 1;
         }
 
@@ -875,12 +884,6 @@
             <button class="btn-down" onclick="setStatus('vipStatus', '(DOWN)')">DOWN</button>
         </div>
 
-        <label>CURRENT SERVER STATUS</label>
-        <div class="status-grid">
-            <button class="btn-up" onclick="setStatus('currentStatus', '(WORKING)')">UP</button>
-            <button class="btn-down" onclick="setStatus('currentStatus', '(DOWN)')">DOWN</button>
-        </div>
-
         <div id="changelog-pusher-section" style="margin-top:15px; border-top: 1px dashed #444; padding-top:10px;">
             <label style="color:#fff;">PUSH CHANGELOG UPDATE</label>
             <input type="text" id="dev-change-input" placeholder="Fixed a bug...">
@@ -892,7 +895,6 @@
             <select id="dev-target">
                 <option value="title">Main Title</option>
                 <option value="vip">Private Server URL</option>
-                <option value="current">Current Server URL</option>
                 <option value="roblox">Roblox URL</option>
                 <option value="youtube">YouTube URL</option>
                 <option value="twitch">Twitch URL</option>
@@ -935,11 +937,6 @@
                 <a href="#" id="live-vip" class="server-vip">Private server <span id="vip-status" class="status"></span></a>
                 <span class="notice gold-text">may not work; tell us in stream. fixed if pixel is online.</span>
             </div>
-
-            <div class="link-group">
-                <a href="#" id="live-current" class="server-current">Current server <span id="cur-status" class="status"></span></a>
-                <span class="notice green-text">if it doesnt work notify us. fixed if pixel is online.</span>
-            </div>
         </div>
 
         <div class="footer">
@@ -948,6 +945,7 @@
 
                 <div class="btn-row-small">
                     <button class="src-link" onclick="openModal('change-modal')">[CHANGELOG]</button>
+                    <button class="src-code-btn" onclick="window.open('https://github.com/pxlzfr/vlinks')">[Source Code]</button>
                 </div>
 
                 <span class="one-liner"><strong>made by pxlzfr (nPixelz)</strong> - "i'm the one developing this-" -pixel</span>
@@ -959,7 +957,7 @@
         </svg>
         <strong>DMS:</strong> vernerz1, pxlzfr
     </div>
-    <div style="color:var(--primary); font-weight:bold;">VISITS: <span id="total-visits"></span></div>
+    <div style="color:var(--primary); font-weight:bold;">VISITS: <span id="total-visits"></span></div> 
 </div>
                 
 
@@ -979,7 +977,7 @@ import { getDatabase, ref, onValue, set, onDisconnect, increment, push } from "h
         storageBucket: "vlinks-backend.firebasestorage.app",
         messagingSenderId: "1054304746220",
         appId: "1:1054304746220:web:758c6a365191abe4ce03c9",
-        databaseURL: "https://vlinks-backend-default-rtdb.europe-west1.firebasedatabase.app"
+        databaseURL: "https://vlinks-backend-default-rtdb.europe-west1.firebasedatabase.app" 
     };
 
     const app = initializeApp(firebaseConfig);
@@ -1208,32 +1206,30 @@ import { getDatabase, ref, onValue, set, onDisconnect, increment, push } from "h
     // Status & DB Sync Logic (Keep your existing updateStatusText, setStatus, presenceRef, etc. here)
     // ... (All other existing window functions like setStatus, pushChangelog, etc., remain exactly as you had them)
 
-        // --- PARTICLE SYSTEM (MOD & DEV) ---
+        // --- PARTICLE SYSTEM (ALL USERS) ---
         const particleContainer = document.getElementById('dev-particles');
         if (particleContainer) {
-            const particleText = isDev ? '[DEV]' : (isMod ? '[MOD]' : null);
+            const particleText = isDev ? '[DEV]' : (isMod ? '[MOD]' : '[LINKS]');
             const particleCount = 60;
             
-            if (particleText) {
-                for (let i = 0; i < particleCount; i++) { 
-                    let span = document.createElement('span');
-                    span.innerText = particleText;
-                    span.className = 'dev-floater';
-                    
-                    // randomize position
-                    span.style.top = Math.random() * 100 + 'vh';
-                    span.style.left = Math.random() * 100 + 'vw';
-                    
-                    // vary speed
-                    span.style.animationDuration = (5 + Math.random() * 10) + 's';
-                    span.style.animationDelay = (Math.random() * 5) + 's';
-                    
-                    // slight scale variation
-                    span.style.fontSize = (0.5 + Math.random() * 0.5) + 'rem';
-                    span.style.opacity = (0.1 + Math.random() * 0.2);
-                    
-                    particleContainer.appendChild(span);
-                }
+            for (let i = 0; i < particleCount; i++) { 
+                let span = document.createElement('span');
+                span.innerText = particleText;
+                span.className = 'dev-floater';
+                
+                // randomize position
+                span.style.top = Math.random() * 100 + 'vh';
+                span.style.left = Math.random() * 100 + 'vw';
+                
+                // vary speed
+                span.style.animationDuration = (5 + Math.random() * 10) + 's';
+                span.style.animationDelay = (Math.random() * 5) + 's';
+                
+                // slight scale variation
+                span.style.fontSize = (0.5 + Math.random() * 0.5) + 'rem';
+                span.style.opacity = (0.1 + Math.random() * 0.2);
+                
+                particleContainer.appendChild(span);
             }
         }
 
